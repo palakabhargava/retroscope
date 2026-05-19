@@ -14,16 +14,36 @@ cp .env.example .env       # then fill in your Supabase keys
 bun run dev                # http://localhost:8080
 ```
 
-### Required env vars (`.env`)
+### Environment Variable Setup
+
+**1. Create your local `.env` file**
+Duplicate the `.env.example` file and rename it to `.env`:
+```bash
+cp .env.example .env
+```
+
+**2. Get your Supabase credentials**
+To find your required variables:
+1. Log into your [Supabase Dashboard](https://supabase.com/dashboard).
+2. Select your project and go to **Project Settings** > **API**.
+3. Copy the **Project URL** and paste it as `VITE_SUPABASE_URL` and `SUPABASE_URL`.
+4. Copy the **anon / public** key and paste it as `VITE_SUPABASE_ANON_KEY`.
+5. Copy the **service_role / secret** key and paste it as `SUPABASE_SERVICE_ROLE_KEY`.
 
 | Variable                          | Where it's used                |
 | --------------------------------- | ------------------------------ |
 | `VITE_SUPABASE_URL`               | Browser Supabase client        |
-| `VITE_SUPABASE_PUBLISHABLE_KEY`   | Browser Supabase client        |
+| `VITE_SUPABASE_ANON_KEY`          | Browser Supabase client        |
 | `VITE_SUPABASE_PROJECT_ID`        | Build-time tagging             |
-| `SUPABASE_URL`                    | Server functions / SSR         |
-| `SUPABASE_PUBLISHABLE_KEY`        | Server functions / SSR         |
+| `SUPABASE_URL`                    | Server functions               |
 | `SUPABASE_SERVICE_ROLE_KEY`       | Admin server fns (never bundle)|
+
+**3. Configure Vercel Deployment**
+When deploying to Vercel, you must manually add these environment variables to your project:
+1. Go to your Vercel Project Dashboard.
+2. Navigate to **Settings** > **Environment Variables**.
+3. Add all the variables listed above.
+4. Trigger a new deployment (or redeploy) for the variables to take effect.
 
 The repo already targets a Lovable Cloud project; to self-host create your own Supabase project, run the migrations under `supabase/migrations/`, and replace the keys above.
 

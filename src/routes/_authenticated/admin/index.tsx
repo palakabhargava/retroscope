@@ -2,8 +2,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { Bar, BarChart, CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { TrendingUp, Users, Film, MessageSquare } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { useServerFn } from '@tanstack/react-start';
-import { adminAnalytics } from '@/lib/admin.functions';
+import { supabase } from '@/integrations/supabase/client';
 import { MOVIES } from '@/data/movies';
 
 export const Route = createFileRoute('/_authenticated/admin/')({ component: AdminHome });
@@ -16,12 +15,25 @@ const watchData = [
 const titleOf = (id: string) => MOVIES.find(m => m.id === id)?.title ?? id;
 
 function AdminHome() {
-  const fetchAnalytics = useServerFn(adminAnalytics);
   const [data, setData] = useState<{ members: number; openComplaints: number; totalPlays: number; top: { movie_id: string; plays: number }[] } | null>(null);
 
   useEffect(() => {
+    const fetchAnalytics = async () => {
+      const session = await supabase.auth.getSession();
+      const token = session.data.session?.access_token;
+      if (!token) throw new Error('No token');
+      
+      const res = await fetch('/api/admin/analytics', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (!res.ok) throw new Error('Failed to fetch');
+      return res.json();
+    };
+
     fetchAnalytics().then(setData).catch(() => setData({ members: 0, openComplaints: 0, totalPlays: 0, top: [] }));
-  }, [fetchAnalytics]);
+  }, []);
 
   const stats = [
     { label: 'Members', value: data ? String(data.members) : '—', icon: Users },

@@ -1,14 +1,12 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useState } from 'react';
-import { useServerFn } from '@tanstack/react-start';
 import { toast } from 'sonner';
-import { broadcastNotification } from '@/lib/admin.functions';
+import { supabase } from '@/integrations/supabase/client';
 import { Megaphone } from 'lucide-react';
 
 export const Route = createFileRoute('/_authenticated/admin/broadcast')({ component: Broadcast });
 
 function Broadcast() {
-  const fn = useServerFn(broadcastNotification);
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
   const [busy, setBusy] = useState(false);
@@ -17,8 +15,26 @@ function Broadcast() {
     e.preventDefault();
     setBusy(true);
     try {
-      const res = await fn({ data: { title, body } });
-      toast.success(`Broadcast delivered to ${res.delivered} member${res.delivered === 1 ? '' : 's'}`);
+      const session = await supabase.auth.getSession();
+      const token = session.data.session?.access_token;
+      if (!token) throw new Error('Not authenticated');
+
+      const res = await fetch('/api/admin/broadcast', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ title, body })
+      });
+      
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || 'Broadcast failed');
+      }
+      
+      const data = await res.json();
+      toast.success(`Broadcast delivered to ${data.delivered} member${data.delivered === 1 ? '' : 's'}`);
       setTitle(''); setBody('');
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Broadcast failed');

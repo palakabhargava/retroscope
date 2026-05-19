@@ -10,7 +10,6 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SubscriptionRouteImport } from './routes/subscription'
-import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
@@ -40,11 +39,6 @@ import { Route as AuthenticatedAdminBroadcastRouteImport } from './routes/_authe
 const SubscriptionRoute = SubscriptionRouteImport.update({
   id: '/subscription',
   path: '/subscription',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
-  id: '/sitemap.xml',
-  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SignupRoute = SignupRouteImport.update({
@@ -187,7 +181,6 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/search': typeof SearchRoute
   '/signup': typeof SignupRoute
-  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/subscription': typeof SubscriptionRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/complaints': typeof AuthenticatedComplaintsRoute
@@ -215,7 +208,6 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/search': typeof SearchRoute
   '/signup': typeof SignupRoute
-  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/subscription': typeof SubscriptionRoute
   '/complaints': typeof AuthenticatedComplaintsRoute
   '/dna': typeof AuthenticatedDnaRoute
@@ -244,7 +236,6 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/search': typeof SearchRoute
   '/signup': typeof SignupRoute
-  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/subscription': typeof SubscriptionRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/complaints': typeof AuthenticatedComplaintsRoute
@@ -274,7 +265,6 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/search'
     | '/signup'
-    | '/sitemap.xml'
     | '/subscription'
     | '/admin'
     | '/complaints'
@@ -302,7 +292,6 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/search'
     | '/signup'
-    | '/sitemap.xml'
     | '/subscription'
     | '/complaints'
     | '/dna'
@@ -330,7 +319,6 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/search'
     | '/signup'
-    | '/sitemap.xml'
     | '/subscription'
     | '/_authenticated/admin'
     | '/_authenticated/complaints'
@@ -360,7 +348,6 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   SearchRoute: typeof SearchRoute
   SignupRoute: typeof SignupRoute
-  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SubscriptionRoute: typeof SubscriptionRoute
   MoviesMovieIdRoute: typeof MoviesMovieIdRoute
   ApiPublicSeedAdminRoute: typeof ApiPublicSeedAdminRoute
@@ -373,13 +360,6 @@ declare module '@tanstack/react-router' {
       path: '/subscription'
       fullPath: '/subscription'
       preLoaderRoute: typeof SubscriptionRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/sitemap.xml': {
-      id: '/sitemap.xml'
-      path: '/sitemap.xml'
-      fullPath: '/sitemap.xml'
-      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/signup': {
@@ -619,7 +599,6 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   SearchRoute: SearchRoute,
   SignupRoute: SignupRoute,
-  SitemapDotxmlRoute: SitemapDotxmlRoute,
   SubscriptionRoute: SubscriptionRoute,
   MoviesMovieIdRoute: MoviesMovieIdRoute,
   ApiPublicSeedAdminRoute: ApiPublicSeedAdminRoute,
