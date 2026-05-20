@@ -7,6 +7,9 @@ import { ProjectorBeam } from '../cinematic/ProjectorBeam';
 import { DustParticles } from '../cinematic/DustParticles';
 import { VHSOverlay } from '../cinematic/VHSOverlay';
 import { IntervalBanner } from '../cinematic/IntervalBanner';
+import { useAuth } from '@/lib/auth';
+import { useAddReaction, useLogPlayEvent } from '@/hooks/queries';
+import { toast } from 'sonner';
 
 export function FakePlayerModal({ movie, open, onClose }: { movie: Movie | null; open: boolean; onClose: () => void }) {
   const [progress, setProgress] = useState(0);
@@ -14,8 +17,18 @@ export function FakePlayerModal({ movie, open, onClose }: { movie: Movie | null;
   const [vhs, setVhs] = useState(false);
   const [interval, setIntervalOn] = useState(false);
 
+  const { user } = useAuth();
+  const addReaction = useAddReaction();
+  const logPlay = useLogPlayEvent();
+
   useEffect(() => {
     if (!open) { setProgress(0); setPlaying(true); setIntervalOn(false); return; }
+    
+    // Log initial play event in analytics
+    if (movie) {
+      logPlay.mutate({ contentId: movie.id, userId: user?.id || undefined, progress: 0 });
+    }
+
     const t = setInterval(() => {
       setProgress(p => {
         const np = Math.min(100, p + (playing ? 0.6 : 0));
@@ -24,7 +37,7 @@ export function FakePlayerModal({ movie, open, onClose }: { movie: Movie | null;
       });
     }, 300);
     return () => clearInterval(t);
-  }, [open, playing, interval]);
+  }, [open, playing, interval, movie]);
 
   return (
     <AnimatePresence>
@@ -67,7 +80,7 @@ export function FakePlayerModal({ movie, open, onClose }: { movie: Movie | null;
             </div>
             <div className="space-y-3 bg-card p-5">
               <FilmReelProgress value={progress} />
-              <div className="flex items-center justify-between">
+              <div className="flex flex-wrap items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
                   <button onClick={() => setPlaying(p => !p)} className="grid h-10 w-10 place-items-center rounded-full bg-primary text-primary-foreground transition hover:bg-hover-glow">
                     {playing ? <Pause size={18} /> : <Play size={18} />}
@@ -76,6 +89,38 @@ export function FakePlayerModal({ movie, open, onClose }: { movie: Movie | null;
                   <button className="text-muted-foreground hover:text-foreground"><Volume2 size={18}/></button>
                   <span className="font-retro text-xs text-muted-foreground">{Math.floor(progress * movie.runtime / 100)}m / {movie.runtime}m</span>
                 </div>
+                
+                {/* Timed Emoji Reactions Bar */}
+                <div className="flex items-center gap-2 rounded-md border border-border/80 bg-background/50 px-3 py-1">
+                  <span className="font-retro text-[9px] uppercase tracking-widest text-muted-foreground mr-1">React:</span>
+                  {['😮', '😭', '🔥', '🤯'].map((emoji) => (
+                    <button
+                      key={emoji}
+                      onClick={async () => {
+                        if (!user?.id) {
+                          toast.error('Sign in to leave a timed reaction!');
+                          return;
+                        }
+                        try {
+                          const currentSecs = Math.floor((progress * movie.runtime * 60) / 100);
+                          await addReaction.mutateAsync({
+                            contentId: movie.id,
+                            userId: user.id,
+                            emoji,
+                            timestamp: currentSecs
+                          });
+                          toast.success(`Reaction ${emoji} logged at ${Math.floor(currentSecs / 60)}m!`);
+                        } catch (err: any) {
+                          toast.error(err.message || 'Failed to log reaction');
+                        }
+                      }}
+                      className="text-lg transition hover:scale-130 active:scale-95 duration-150 px-1"
+                    >
+                      {emoji}
+                    </button>
+                  ))}
+                </div>
+
                 <button onClick={() => setVhs(v => !v)}
                   className={`flex items-center gap-2 rounded-sm border px-3 py-1.5 font-retro text-xs uppercase tracking-widest transition
                     ${vhs ? 'border-primary text-primary' : 'border-border text-muted-foreground hover:text-foreground'}`}>

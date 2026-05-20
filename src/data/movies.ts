@@ -1,9 +1,11 @@
 export type Mood = 'lonely' | 'happy' | 'emotional' | 'night-vibes' | 'mind-blowing' | 'thriller-rush' | 'rainy-mood' | 'comfort-watch';
 export type Atmosphere = 'horror' | 'romance' | 'sci-fi' | 'drama' | 'thriller' | 'comedy' | 'classic';
+export type ContentType = 'movie' | 'web_series' | 'short_film' | 'documentary' | 'mockumentary' | 'short_video';
 
 export interface Movie {
   id: string;
   title: string;
+  type: ContentType;
   year: number;
   runtime: number; // minutes
   genres: string[];
@@ -13,12 +15,56 @@ export interface Movie {
   director: string;
   cast: string[];
   synopsis: string;
-  poster: string;       // CSS background-image value
-  banner: string;       // CSS background-image value
+  poster: string;       // CSS background-image value or URL
+  banner: string;       // CSS background-image value or URL
   trailerId?: string;   // YouTube video id
   tagline: string;
+  isPremium?: boolean;
   reactions?: { time: number; emoji: string; label: string }[];
 }
+
+export const CONTENT_TYPES: { id: ContentType; label: string }[] = [
+  { id: 'movie', label: 'Movies' },
+  { id: 'web_series', label: 'Web Series' },
+  { id: 'short_film', label: 'Short Films' },
+  { id: 'documentary', label: 'Documentaries' },
+  { id: 'mockumentary', label: 'Mockumentaries' },
+  { id: 'short_video', label: 'Short Videos' },
+];
+
+export function mapDbToMovie(row: any, averageRating?: number): Movie {
+  const isPosterUrl = row.poster && (row.poster.startsWith('http') || row.poster.startsWith('/') || row.poster.startsWith('linear'));
+  const posterStyle = row.poster
+    ? (isPosterUrl && !row.poster.startsWith('linear') ? `url('${row.poster}')` : row.poster)
+    : (row.trailer_id ? `url('https://i.ytimg.com/vi/${row.trailer_id}/hqdefault.jpg')` : `linear-gradient(135deg, #1f1f1f 0%, #111 100%)`);
+
+  const isBannerUrl = row.banner && (row.banner.startsWith('http') || row.banner.startsWith('/') || row.banner.startsWith('linear'));
+  const bannerStyle = row.banner
+    ? (isBannerUrl && !row.banner.startsWith('linear') ? `url('${row.banner}')` : row.banner)
+    : (row.trailer_id ? `url('https://i.ytimg.com/vi/${row.trailer_id}/maxresdefault.jpg')` : `linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%)`);
+
+  return {
+    id: row.id,
+    title: row.title,
+    type: row.type as ContentType,
+    year: row.year,
+    runtime: row.runtime,
+    genres: row.genres || [],
+    moods: (row.moods || []) as Mood[],
+    atmosphere: row.atmosphere as Atmosphere,
+    rating: averageRating !== undefined ? +averageRating.toFixed(1) : 7.5,
+    director: row.director || 'Unknown',
+    cast: row.cast || [],
+    synopsis: row.synopsis || '',
+    poster: posterStyle,
+    banner: bannerStyle,
+    trailerId: row.trailer_id || undefined,
+    tagline: row.tagline || '',
+    isPremium: row.is_premium || false,
+    reactions: [],
+  };
+}
+
 
 const POSTER_PALETTES: Record<Atmosphere, [string, string, string]> = {
   horror:   ['#3a0a0a', '#7a1d1d', '#1a0505'],
@@ -67,38 +113,18 @@ const TITLES: RawTitle[] = [
   { title: 'Ponniyin Selvan: I', year: 2022, runtime: 167, genres: ['Action','Drama','Epic'], moods: ['mind-blowing','emotional'], atmosphere: 'drama', director: 'Mani Ratnam', cast: ['Vikram','Aishwarya Rai','Jayam Ravi','Karthi'], tagline: 'The empire of the Cholas begins.', trailerId: '6mp4Qzpa2EQ', rating: 7.6 },
   { title: 'Leo', year: 2023, runtime: 164, genres: ['Action','Crime','Thriller'], moods: ['thriller-rush'], atmosphere: 'thriller', director: 'Lokesh Kanagaraj', cast: ['Vijay','Sanjay Dutt','Trisha'], tagline: 'A man with no past has the most to hide.', trailerId: 'Po3jStA673E', rating: 7.0 },
   { title: 'Article 15', year: 2019, runtime: 130, genres: ['Crime','Drama','Mystery'], moods: ['emotional','rainy-mood'], atmosphere: 'drama', director: 'Anubhav Sinha', cast: ['Ayushmann Khurrana','Isha Talwar','Sayani Gupta'], tagline: 'Farq bahut kar liya, ab farq laayenge.', trailerId: 'WBPWUkSlcCc', rating: 8.1 },
+  { title: 'Inception', year: 2010, runtime: 148, genres: ['Action','Sci-Fi','Thriller'], moods: ['mind-blowing','night-vibes'], atmosphere: 'sci-fi', director: 'Christopher Nolan', cast: ['Leonardo DiCaprio','Joseph Gordon-Levitt','Elliot Page'], tagline: 'Your mind is the scene of the crime.', trailerId: 'YoHD9XEInc0', rating: 8.8 },
+  { title: 'The Dark Knight', year: 2008, runtime: 152, genres: ['Action','Crime','Drama'], moods: ['thriller-rush','mind-blowing'], atmosphere: 'thriller', director: 'Christopher Nolan', cast: ['Christian Bale','Heath Ledger','Aaron Eckhart'], tagline: 'Welcome to a world without rules.', trailerId: 'EXeTwQWrcwY', rating: 9.0 },
+  { title: 'Interstellar', year: 2014, runtime: 169, genres: ['Adventure','Drama','Sci-Fi'], moods: ['mind-blowing','emotional','lonely'], atmosphere: 'sci-fi', director: 'Christopher Nolan', cast: ['Matthew McConaughey','Anne Hathaway','Jessica Chastain'], tagline: 'Mankind was born on Earth. It was never meant to die here.', trailerId: 'zSWdZVtXT7E', rating: 8.7 },
+  { title: 'Parasite', year: 2019, runtime: 132, genres: ['Drama','Thriller','Comedy'], moods: ['mind-blowing','thriller-rush'], atmosphere: 'thriller', director: 'Bong Joon Ho', cast: ['Song Kang-ho','Lee Sun-kyun','Cho Yeo-jeong'], tagline: 'Act like you own the place.', trailerId: '5xVEdm4N9eI', rating: 8.5 },
+  { title: 'Whiplash', year: 2014, runtime: 106, genres: ['Drama','Music'], moods: ['thriller-rush','emotional'], atmosphere: 'drama', director: 'Damien Chazelle', cast: ['Miles Teller','J.K. Simmons','Melissa Benoist'], tagline: 'The road to greatness can take you to the edge.', trailerId: '7d_jQycdQGo', rating: 8.5 },
 ];
 
 const ytPoster  = (id: string) => `url('https://i.ytimg.com/vi/${id}/hqdefault.jpg')`;
 const ytBanner  = (id: string) => `url('https://i.ytimg.com/vi/${id}/maxresdefault.jpg')`;
 
-// Real movie posters (Wikipedia/Wikimedia, fair-use thumbnails)
-const POSTER_OVERRIDES: Record<string, string> = {
-  'Baahubali: The Beginning': 'https://upload.wikimedia.org/wikipedia/en/5/5f/Baahubali_The_Beginning_poster.jpg',
-  'Baahubali 2: The Conclusion': 'https://upload.wikimedia.org/wikipedia/en/9/93/Baahubali_2_The_Conclusion_poster.jpg',
-  'Salaar: Part 1 – Ceasefire': 'https://upload.wikimedia.org/wikipedia/en/a/a6/Salaar_Part_1_%E2%80%93_Ceasefire.jpg',
-  'RRR': 'https://upload.wikimedia.org/wikipedia/en/d/d7/RRR_Poster.jpg',
-  'KGF: Chapter 1': 'https://upload.wikimedia.org/wikipedia/en/c/cc/K.G.F_Chapter_1_poster.jpg',
-  'KGF: Chapter 2': 'https://upload.wikimedia.org/wikipedia/en/d/d0/K.G.F_Chapter_2.jpg',
-  'Pushpa: The Rise': 'https://upload.wikimedia.org/wikipedia/en/7/75/Pushpa_-_The_Rise_%282021_film%29.jpg',
-  'Kantara': 'https://upload.wikimedia.org/wikipedia/en/8/84/Kantara_poster.jpeg',
-  'Jawan': 'https://upload.wikimedia.org/wikipedia/en/3/39/Jawan_film_poster.jpg',
-  'Pathaan': 'https://upload.wikimedia.org/wikipedia/en/c/c3/Pathaan_film_poster.jpg',
-  '3 Idiots': 'https://upload.wikimedia.org/wikipedia/en/d/df/3_idiots_poster.jpg',
-  'Dangal': 'https://upload.wikimedia.org/wikipedia/en/3/3e/Dangal_Poster.jpg',
-  'PK': 'https://upload.wikimedia.org/wikipedia/en/c/c3/PK_poster.jpg',
-  'Drishyam 2': 'https://upload.wikimedia.org/wikipedia/en/9/9e/Drishyam_2_2022_film_poster.jpg',
-  'Andhadhun': 'https://upload.wikimedia.org/wikipedia/en/4/47/Andhadhun_poster.jpg',
-  'Tumbbad': 'https://upload.wikimedia.org/wikipedia/en/4/41/Tumbbad_poster.jpg',
-  'Lagaan': 'https://upload.wikimedia.org/wikipedia/en/b/b6/Lagaan.jpg',
-  'Zindagi Na Milegi Dobara': 'https://upload.wikimedia.org/wikipedia/en/1/17/Zindagi_Na_Milegi_Dobara.jpg',
-  'Animal': 'https://upload.wikimedia.org/wikipedia/en/9/90/Animal_%282023_film%29_poster.jpg',
-  'Vikram': 'https://upload.wikimedia.org/wikipedia/en/9/93/Vikram_2022_poster.jpg',
-  'Master': 'https://upload.wikimedia.org/wikipedia/en/5/53/Master_2021_poster.jpg',
-  'Ponniyin Selvan: I': 'https://upload.wikimedia.org/wikipedia/en/c/c3/Ponniyin_Selvan_I.jpg',
-  'Leo': 'https://upload.wikimedia.org/wikipedia/en/7/75/Leo_%282023_Indian_film%29.jpg',
-  'Article 15': 'https://upload.wikimedia.org/wikipedia/en/1/11/Article_15_Poster.jpg',
-};
+// Wikipedia posters blocked hotlinking, so we removed them to fallback to YouTube thumbnails automatically.
+const POSTER_OVERRIDES: Record<string, string> = {};
 
 export const posterUrl = (title: string, fallback?: string): string | undefined => {
   const u = POSTER_OVERRIDES[title];

@@ -9,12 +9,17 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as WebSeriesRouteImport } from './routes/web-series'
+import { Route as TrendingRouteImport } from './routes/trending'
+import { Route as TopRatedRouteImport } from './routes/top-rated'
 import { Route as SubscriptionRouteImport } from './routes/subscription'
 import { Route as SignupRouteImport } from './routes/signup'
+import { Route as ShortFilmsRouteImport } from './routes/short-films'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
+import { Route as DocumentariesRouteImport } from './routes/documentaries'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as MoviesMovieIdRouteImport } from './routes/movies.$movieId'
@@ -30,12 +35,28 @@ import { Route as ApiPublicSeedAdminRouteImport } from './routes/api/public/seed
 import { Route as AuthenticatedHeatmapMovieIdRouteImport } from './routes/_authenticated/heatmap.$movieId'
 import { Route as AuthenticatedAdminThemesRouteImport } from './routes/_authenticated/admin/themes'
 import { Route as AuthenticatedAdminSchedulerRouteImport } from './routes/_authenticated/admin/scheduler'
+import { Route as AuthenticatedAdminReviewsRouteImport } from './routes/_authenticated/admin/reviews'
 import { Route as AuthenticatedAdminMoviesRouteImport } from './routes/_authenticated/admin/movies'
 import { Route as AuthenticatedAdminMoodsRouteImport } from './routes/_authenticated/admin/moods'
 import { Route as AuthenticatedAdminHeatmapRouteImport } from './routes/_authenticated/admin/heatmap'
 import { Route as AuthenticatedAdminComplaintsRouteImport } from './routes/_authenticated/admin/complaints'
 import { Route as AuthenticatedAdminBroadcastRouteImport } from './routes/_authenticated/admin/broadcast'
 
+const WebSeriesRoute = WebSeriesRouteImport.update({
+  id: '/web-series',
+  path: '/web-series',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TrendingRoute = TrendingRouteImport.update({
+  id: '/trending',
+  path: '/trending',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TopRatedRoute = TopRatedRouteImport.update({
+  id: '/top-rated',
+  path: '/top-rated',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SubscriptionRoute = SubscriptionRouteImport.update({
   id: '/subscription',
   path: '/subscription',
@@ -44,6 +65,11 @@ const SubscriptionRoute = SubscriptionRouteImport.update({
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
   path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShortFilmsRoute = ShortFilmsRouteImport.update({
+  id: '/short-films',
+  path: '/short-films',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SearchRoute = SearchRouteImport.update({
@@ -64,6 +90,11 @@ const LoginRoute = LoginRouteImport.update({
 const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
   id: '/forgot-password',
   path: '/forgot-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DocumentariesRoute = DocumentariesRouteImport.update({
+  id: '/documentaries',
+  path: '/documentaries',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
@@ -144,6 +175,12 @@ const AuthenticatedAdminSchedulerRoute =
     path: '/scheduler',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminReviewsRoute =
+  AuthenticatedAdminReviewsRouteImport.update({
+    id: '/reviews',
+    path: '/reviews',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminMoviesRoute =
   AuthenticatedAdminMoviesRouteImport.update({
     id: '/movies',
@@ -176,12 +213,17 @@ const AuthenticatedAdminBroadcastRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/documentaries': typeof DocumentariesRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
   '/search': typeof SearchRoute
+  '/short-films': typeof ShortFilmsRoute
   '/signup': typeof SignupRoute
   '/subscription': typeof SubscriptionRoute
+  '/top-rated': typeof TopRatedRoute
+  '/trending': typeof TrendingRoute
+  '/web-series': typeof WebSeriesRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/complaints': typeof AuthenticatedComplaintsRoute
   '/dna': typeof AuthenticatedDnaRoute
@@ -195,6 +237,7 @@ export interface FileRoutesByFullPath {
   '/admin/heatmap': typeof AuthenticatedAdminHeatmapRoute
   '/admin/moods': typeof AuthenticatedAdminMoodsRoute
   '/admin/movies': typeof AuthenticatedAdminMoviesRoute
+  '/admin/reviews': typeof AuthenticatedAdminReviewsRoute
   '/admin/scheduler': typeof AuthenticatedAdminSchedulerRoute
   '/admin/themes': typeof AuthenticatedAdminThemesRoute
   '/heatmap/$movieId': typeof AuthenticatedHeatmapMovieIdRoute
@@ -203,12 +246,17 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/documentaries': typeof DocumentariesRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
   '/search': typeof SearchRoute
+  '/short-films': typeof ShortFilmsRoute
   '/signup': typeof SignupRoute
   '/subscription': typeof SubscriptionRoute
+  '/top-rated': typeof TopRatedRoute
+  '/trending': typeof TrendingRoute
+  '/web-series': typeof WebSeriesRoute
   '/complaints': typeof AuthenticatedComplaintsRoute
   '/dna': typeof AuthenticatedDnaRoute
   '/history': typeof AuthenticatedHistoryRoute
@@ -221,6 +269,7 @@ export interface FileRoutesByTo {
   '/admin/heatmap': typeof AuthenticatedAdminHeatmapRoute
   '/admin/moods': typeof AuthenticatedAdminMoodsRoute
   '/admin/movies': typeof AuthenticatedAdminMoviesRoute
+  '/admin/reviews': typeof AuthenticatedAdminReviewsRoute
   '/admin/scheduler': typeof AuthenticatedAdminSchedulerRoute
   '/admin/themes': typeof AuthenticatedAdminThemesRoute
   '/heatmap/$movieId': typeof AuthenticatedHeatmapMovieIdRoute
@@ -231,12 +280,17 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
+  '/documentaries': typeof DocumentariesRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
   '/search': typeof SearchRoute
+  '/short-films': typeof ShortFilmsRoute
   '/signup': typeof SignupRoute
   '/subscription': typeof SubscriptionRoute
+  '/top-rated': typeof TopRatedRoute
+  '/trending': typeof TrendingRoute
+  '/web-series': typeof WebSeriesRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/complaints': typeof AuthenticatedComplaintsRoute
   '/_authenticated/dna': typeof AuthenticatedDnaRoute
@@ -250,6 +304,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/heatmap': typeof AuthenticatedAdminHeatmapRoute
   '/_authenticated/admin/moods': typeof AuthenticatedAdminMoodsRoute
   '/_authenticated/admin/movies': typeof AuthenticatedAdminMoviesRoute
+  '/_authenticated/admin/reviews': typeof AuthenticatedAdminReviewsRoute
   '/_authenticated/admin/scheduler': typeof AuthenticatedAdminSchedulerRoute
   '/_authenticated/admin/themes': typeof AuthenticatedAdminThemesRoute
   '/_authenticated/heatmap/$movieId': typeof AuthenticatedHeatmapMovieIdRoute
@@ -260,12 +315,17 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/documentaries'
     | '/forgot-password'
     | '/login'
     | '/reset-password'
     | '/search'
+    | '/short-films'
     | '/signup'
     | '/subscription'
+    | '/top-rated'
+    | '/trending'
+    | '/web-series'
     | '/admin'
     | '/complaints'
     | '/dna'
@@ -279,6 +339,7 @@ export interface FileRouteTypes {
     | '/admin/heatmap'
     | '/admin/moods'
     | '/admin/movies'
+    | '/admin/reviews'
     | '/admin/scheduler'
     | '/admin/themes'
     | '/heatmap/$movieId'
@@ -287,12 +348,17 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/documentaries'
     | '/forgot-password'
     | '/login'
     | '/reset-password'
     | '/search'
+    | '/short-films'
     | '/signup'
     | '/subscription'
+    | '/top-rated'
+    | '/trending'
+    | '/web-series'
     | '/complaints'
     | '/dna'
     | '/history'
@@ -305,6 +371,7 @@ export interface FileRouteTypes {
     | '/admin/heatmap'
     | '/admin/moods'
     | '/admin/movies'
+    | '/admin/reviews'
     | '/admin/scheduler'
     | '/admin/themes'
     | '/heatmap/$movieId'
@@ -314,12 +381,17 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/documentaries'
     | '/forgot-password'
     | '/login'
     | '/reset-password'
     | '/search'
+    | '/short-films'
     | '/signup'
     | '/subscription'
+    | '/top-rated'
+    | '/trending'
+    | '/web-series'
     | '/_authenticated/admin'
     | '/_authenticated/complaints'
     | '/_authenticated/dna'
@@ -333,6 +405,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/heatmap'
     | '/_authenticated/admin/moods'
     | '/_authenticated/admin/movies'
+    | '/_authenticated/admin/reviews'
     | '/_authenticated/admin/scheduler'
     | '/_authenticated/admin/themes'
     | '/_authenticated/heatmap/$movieId'
@@ -343,18 +416,44 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
+  DocumentariesRoute: typeof DocumentariesRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   LoginRoute: typeof LoginRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SearchRoute: typeof SearchRoute
+  ShortFilmsRoute: typeof ShortFilmsRoute
   SignupRoute: typeof SignupRoute
   SubscriptionRoute: typeof SubscriptionRoute
+  TopRatedRoute: typeof TopRatedRoute
+  TrendingRoute: typeof TrendingRoute
+  WebSeriesRoute: typeof WebSeriesRoute
   MoviesMovieIdRoute: typeof MoviesMovieIdRoute
   ApiPublicSeedAdminRoute: typeof ApiPublicSeedAdminRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/web-series': {
+      id: '/web-series'
+      path: '/web-series'
+      fullPath: '/web-series'
+      preLoaderRoute: typeof WebSeriesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/trending': {
+      id: '/trending'
+      path: '/trending'
+      fullPath: '/trending'
+      preLoaderRoute: typeof TrendingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/top-rated': {
+      id: '/top-rated'
+      path: '/top-rated'
+      fullPath: '/top-rated'
+      preLoaderRoute: typeof TopRatedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/subscription': {
       id: '/subscription'
       path: '/subscription'
@@ -367,6 +466,13 @@ declare module '@tanstack/react-router' {
       path: '/signup'
       fullPath: '/signup'
       preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/short-films': {
+      id: '/short-films'
+      path: '/short-films'
+      fullPath: '/short-films'
+      preLoaderRoute: typeof ShortFilmsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/search': {
@@ -395,6 +501,13 @@ declare module '@tanstack/react-router' {
       path: '/forgot-password'
       fullPath: '/forgot-password'
       preLoaderRoute: typeof ForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/documentaries': {
+      id: '/documentaries'
+      path: '/documentaries'
+      fullPath: '/documentaries'
+      preLoaderRoute: typeof DocumentariesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -502,6 +615,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminSchedulerRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/reviews': {
+      id: '/_authenticated/admin/reviews'
+      path: '/reviews'
+      fullPath: '/admin/reviews'
+      preLoaderRoute: typeof AuthenticatedAdminReviewsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/movies': {
       id: '/_authenticated/admin/movies'
       path: '/movies'
@@ -546,6 +666,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminHeatmapRoute: typeof AuthenticatedAdminHeatmapRoute
   AuthenticatedAdminMoodsRoute: typeof AuthenticatedAdminMoodsRoute
   AuthenticatedAdminMoviesRoute: typeof AuthenticatedAdminMoviesRoute
+  AuthenticatedAdminReviewsRoute: typeof AuthenticatedAdminReviewsRoute
   AuthenticatedAdminSchedulerRoute: typeof AuthenticatedAdminSchedulerRoute
   AuthenticatedAdminThemesRoute: typeof AuthenticatedAdminThemesRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
@@ -557,6 +678,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminHeatmapRoute: AuthenticatedAdminHeatmapRoute,
   AuthenticatedAdminMoodsRoute: AuthenticatedAdminMoodsRoute,
   AuthenticatedAdminMoviesRoute: AuthenticatedAdminMoviesRoute,
+  AuthenticatedAdminReviewsRoute: AuthenticatedAdminReviewsRoute,
   AuthenticatedAdminSchedulerRoute: AuthenticatedAdminSchedulerRoute,
   AuthenticatedAdminThemesRoute: AuthenticatedAdminThemesRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
@@ -594,12 +716,17 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
+  DocumentariesRoute: DocumentariesRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   LoginRoute: LoginRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SearchRoute: SearchRoute,
+  ShortFilmsRoute: ShortFilmsRoute,
   SignupRoute: SignupRoute,
   SubscriptionRoute: SubscriptionRoute,
+  TopRatedRoute: TopRatedRoute,
+  TrendingRoute: TrendingRoute,
+  WebSeriesRoute: WebSeriesRoute,
   MoviesMovieIdRoute: MoviesMovieIdRoute,
   ApiPublicSeedAdminRoute: ApiPublicSeedAdminRoute,
 }

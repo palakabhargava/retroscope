@@ -8,6 +8,11 @@ export function TopNav() {
   const links: Array<[string, string]> = [
     ['/', 'Home'],
     ['/search', 'Browse'],
+    ['/web-series', 'Series'],
+    ['/documentaries', 'Docs'],
+    ['/short-films', 'Shorts'],
+    ['/trending', 'Trending'],
+    ['/top-rated', 'Top Rated'],
     ['/subscription', 'Plans'],
   ];
   const authedLinks: Array<[string, string]> = isAuthenticated ? [

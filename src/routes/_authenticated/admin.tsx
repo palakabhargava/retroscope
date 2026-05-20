@@ -1,6 +1,6 @@
 import { createFileRoute, Outlet, Navigate, Link, useRouterState } from '@tanstack/react-router';
 import { useAuth } from '@/lib/auth';
-import { LayoutDashboard, Film, Heart, Activity, Palette, CalendarRange, MessageSquare, Megaphone, LogOut } from 'lucide-react';
+import { LayoutDashboard, Film, Heart, Activity, Palette, CalendarRange, MessageSquare, Megaphone, LogOut, Star } from 'lucide-react';
 
 export const Route = createFileRoute('/_authenticated/admin')({ component: AdminLayout });
 
@@ -12,7 +12,8 @@ function AdminLayout() {
 
   const items: Array<[string, string, typeof LayoutDashboard]> = [
     ['/admin', 'Overview', LayoutDashboard],
-    ['/admin/movies', 'Movies', Film],
+    ['/admin/movies', 'Catalogue', Film],
+    ['/admin/reviews', 'Reviews', Star],
     ['/admin/moods', 'Moods', Heart],
     ['/admin/heatmap', 'Heatmap', Activity],
     ['/admin/themes', 'Themes', Palette],
