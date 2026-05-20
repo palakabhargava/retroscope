@@ -1,6 +1,6 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Special+Elite&family=Inter:wght@300;400;500;600;700&display=swap');
 @import "tailwindcss" source(none);
 @import "tw-animate-css";
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Special+Elite&family=Inter:wght@300;400;500;600;700&display=swap');
 @source "../src";
 
 @custom-variant dark (&:is(.dark *));
@@ -193,4 +193,12 @@
   .ambient-cool   { box-shadow: 0 0 80px -20px oklch(0.65 0.18 230 / 0.50); }
   .ambient-olive  { box-shadow: 0 0 80px -20px oklch(0.55 0.14 120 / 0.50); }
   .ambient-amber  { box-shadow: 0 0 80px -20px oklch(0.80 0.16 70 / 0.55); }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
 }
+

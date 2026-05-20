@@ -4,3 +4,5 @@ Disallow: /admin
 Disallow: /login
 Disallow: /reset-password
 Disallow: /forgot-password
+
+Sitemap: https://retroscope.app/sitemap.xml

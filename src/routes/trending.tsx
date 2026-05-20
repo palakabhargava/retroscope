@@ -17,24 +17,42 @@ export const Route = createFileRoute('/trending')({
   }),
 });
 
+import { SpotlightSkeleton } from '@/components/layout/PageSkeletons';
+import { SEOHelper } from '@/components/layout/SEOHelper';
+
 function TrendingPage() {
   const { data: trending = [], isLoading } = useTrendingContent();
 
   const featured = trending[0];
 
   if (isLoading) {
-    return (
-      <div className="grid h-[80vh] place-items-center bg-background">
-        <div className="flex flex-col items-center gap-3">
-          <div className="h-10 w-10 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-          <p className="font-retro text-xs uppercase tracking-widest text-muted-foreground animate-pulse">Calculating audience counts...</p>
-        </div>
-      </div>
-    );
+    return <SpotlightSkeleton />;
   }
+
+  const trendingSchema = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "name": "Trending Broadcasts on RetroScope",
+    "description": "Reels with active playback logs, real-time reviews, and high-frequency timed reactions on RetroScope.",
+    "numberOfItems": trending.length,
+    "itemListElement": trending.slice(0, 10).map((m, idx) => ({
+      "@type": "ListItem",
+      "position": idx + 1,
+      "name": m.title,
+      "url": typeof window !== 'undefined' ? `${window.location.origin}/movies/${m.id}` : `https://retroscope.app/movies/${m.id}`
+    }))
+  };
 
   return (
     <div className="min-h-screen bg-background text-foreground pb-20">
+      <SEOHelper 
+        title="Trending Reels & Hot Broadcasts — RetroScope"
+        description="See what other projection room visitors are screening on RetroScope. Dynamic live playback analytics, trending movies, and popular vintage content."
+        ogType="website"
+        canonicalPath="/trending"
+        schema={trendingSchema}
+      />
+
       {/* Featured Banner Section */}
       {featured ? (
         <section className="relative h-[65vh] min-h-[480px] w-full overflow-hidden vignette" style={{ backgroundImage: featured.banner }}>

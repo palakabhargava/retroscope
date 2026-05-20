@@ -134,21 +134,40 @@ export function useContents(filters?: {
         return mappedDemo;
       }
 
-      // For each content item, we fetch its average rating
-      const mapped = await Promise.all(
-        (data || []).map(async (row) => {
-          const { data: ratingData } = await supabase
-            .from('ratings')
-            .select('rating')
-            .eq('content_id', row.id);
-          
-          const avg = ratingData && ratingData.length > 0 
-            ? ratingData.reduce((sum, r) => sum + r.rating, 0) / ratingData.length
-            : 7.5; // default fallback if no ratings yet
+      // Batch fetch ratings in a single query to resolve N+1 loop
+      const contentIds = (data || []).map(r => r.id);
+      const ratingMap: Record<string, number> = {};
 
-          return mapDbToMovie(row, avg);
-        })
-      );
+      if (contentIds.length > 0) {
+        try {
+          const { data: ratingRows, error: ratingErr } = await supabase
+            .from('ratings')
+            .select('content_id, rating')
+            .in('content_id', contentIds);
+
+          if (!ratingErr && ratingRows) {
+            const ratingsById: Record<string, number[]> = {};
+            ratingRows.forEach(r => {
+              if (!ratingsById[r.content_id]) {
+                ratingsById[r.content_id] = [];
+              }
+              ratingsById[r.content_id].push(r.rating);
+            });
+
+            Object.keys(ratingsById).forEach(cid => {
+              const list = ratingsById[cid];
+              ratingMap[cid] = list.reduce((sum, val) => sum + val, 0) / list.length;
+            });
+          }
+        } catch (err) {
+          console.warn("Failed to batch fetch ratings:", err);
+        }
+      }
+
+      const mapped = (data || []).map((row) => {
+        const avg = ratingMap[row.id] !== undefined ? ratingMap[row.id] : 7.5;
+        return mapDbToMovie(row, avg);
+      });
 
       return mapped;
     },
@@ -427,15 +446,40 @@ export function useTrendingContent() {
       
       const sortedIds = [...counts.entries()].sort((a, b) => b[1] - a[1]).map(x => x[0]);
 
-      const mapped = await Promise.all(
-        contentRows.map(async (row) => {
-          const { data: ratingData } = await supabase.from('ratings').select('rating').eq('content_id', row.id);
-          const avg = ratingData && ratingData.length > 0
-            ? ratingData.reduce((sum, r) => sum + r.rating, 0) / ratingData.length
-            : 7.5;
-          return mapDbToMovie(row, avg);
-        })
-      );
+      // Batch fetch ratings in a single query to resolve N+1 loop
+      const contentIds = (contentRows || []).map(r => r.id);
+      const ratingMap: Record<string, number> = {};
+
+      if (contentIds.length > 0) {
+        try {
+          const { data: ratingRows } = await supabase
+            .from('ratings')
+            .select('content_id, rating')
+            .in('content_id', contentIds);
+
+          if (ratingRows) {
+            const ratingsById: Record<string, number[]> = {};
+            ratingRows.forEach(r => {
+              if (!ratingsById[r.content_id]) {
+                ratingsById[r.content_id] = [];
+              }
+              ratingsById[r.content_id].push(r.rating);
+            });
+
+            Object.keys(ratingsById).forEach(cid => {
+              const list = ratingsById[cid];
+              ratingMap[cid] = list.reduce((sum, val) => sum + val, 0) / list.length;
+            });
+          }
+        } catch (err) {
+          console.warn("Failed to batch fetch ratings for trending content:", err);
+        }
+      }
+
+      const mapped = contentRows.map((row) => {
+        const avg = ratingMap[row.id] !== undefined ? ratingMap[row.id] : 7.5;
+        return mapDbToMovie(row, avg);
+      });
 
       // Sort according to play counts, fallback to year descending
       return mapped.sort((a, b) => {
@@ -468,15 +512,40 @@ export function useTopRatedContent() {
         return localMapped.sort((a, b) => b.rating - a.rating);
       }
 
-      const mapped = await Promise.all(
-        contentRows.map(async (row) => {
-          const { data: ratingData } = await supabase.from('ratings').select('rating').eq('content_id', row.id);
-          const avg = ratingData && ratingData.length > 0
-            ? ratingData.reduce((sum, r) => sum + r.rating, 0) / ratingData.length
-            : 7.5;
-          return mapDbToMovie(row, avg);
-        })
-      );
+      // Batch fetch ratings in a single query to resolve N+1 loop
+      const contentIds = (contentRows || []).map(r => r.id);
+      const ratingMap: Record<string, number> = {};
+
+      if (contentIds.length > 0) {
+        try {
+          const { data: ratingRows } = await supabase
+            .from('ratings')
+            .select('content_id, rating')
+            .in('content_id', contentIds);
+
+          if (ratingRows) {
+            const ratingsById: Record<string, number[]> = {};
+            ratingRows.forEach(r => {
+              if (!ratingsById[r.content_id]) {
+                ratingsById[r.content_id] = [];
+              }
+              ratingsById[r.content_id].push(r.rating);
+            });
+
+            Object.keys(ratingsById).forEach(cid => {
+              const list = ratingsById[cid];
+              ratingMap[cid] = list.reduce((sum, val) => sum + val, 0) / list.length;
+            });
+          }
+        } catch (err) {
+          console.warn("Failed to batch fetch ratings for top rated content:", err);
+        }
+      }
+
+      const mapped = contentRows.map((row) => {
+        const avg = ratingMap[row.id] !== undefined ? ratingMap[row.id] : 7.5;
+        return mapDbToMovie(row, avg);
+      });
 
       // Sort by rating descending
       return mapped.sort((a, b) => b.rating - a.rating);

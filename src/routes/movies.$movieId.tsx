@@ -22,6 +22,9 @@ export const Route = createFileRoute('/movies/$movieId')({
   }
 });
 
+import { MovieDetailSkeleton } from '@/components/layout/PageSkeletons';
+import { SEOHelper } from '@/components/layout/SEOHelper';
+
 function MovieDetail() {
   const { movieId } = Route.useParams();
   const { user } = useAuth();
@@ -44,14 +47,7 @@ function MovieDetail() {
   const deleteReview = useDeleteReview();
 
   if (isLoading) {
-    return (
-      <div className="grid min-h-[70vh] place-items-center">
-        <div className="text-center space-y-4">
-          <div className="mx-auto h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent"/>
-          <p className="font-retro text-xs uppercase tracking-widest text-muted-foreground">Threading the reel…</p>
-        </div>
-      </div>
-    );
+    return <MovieDetailSkeleton />;
   }
 
   if (error || !itemData) {
@@ -66,6 +62,29 @@ function MovieDetail() {
   }
 
   const { movie, averageRating, ratingCount, reviews } = itemData;
+
+  const movieSchema = {
+    "@context": "https://schema.org",
+    "@type": movie.type === 'web_series' ? 'TVSeries' : 'Movie',
+    "name": movie.title,
+    "description": movie.synopsis,
+    "image": movie.poster,
+    "dateCreated": movie.year,
+    "director": {
+      "@type": "Person",
+      "name": movie.director
+    },
+    "actor": movie.cast.map(c => ({
+      "@type": "Person",
+      "name": c
+    })),
+    "aggregateRating": averageRating ? {
+      "@type": "AggregateRating",
+      "ratingValue": averageRating,
+      "reviewCount": ratingCount || 1
+    } : undefined
+  };
+
 
   // Filter related elements using allMovies
   const related = (allMovies || [])
@@ -121,6 +140,14 @@ function MovieDetail() {
 
   return (
     <div>
+      <SEOHelper 
+        title={`${movie.title} (${movie.year}) — Stream on RetroScope`}
+        description={movie.synopsis}
+        ogType={movie.type === 'web_series' ? 'video.tv_show' : 'video.movie'}
+        ogImage={movie.poster}
+        canonicalPath={`/movies/${movie.id}`}
+        schema={movieSchema}
+      />
       <section className="relative h-[70vh] min-h-[460px] w-full overflow-hidden bg-cover bg-center vignette" style={{ backgroundImage: movie.banner }}>
         <ProjectorBeam />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-background/10" />

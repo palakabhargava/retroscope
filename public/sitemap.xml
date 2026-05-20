@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- Lobby / Homepage -->
+  <url>
+    <loc>https://retroscope.app/</loc>
+    <lastmod>2026-05-20</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <!-- Search & Catalog -->
+  <url>
+    <loc>https://retroscope.app/search</loc>
+    <lastmod>2026-05-20</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <!-- Curated Rows -->
+  <url>
+    <loc>https://retroscope.app/trending</loc>
+    <lastmod>2026-05-20</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://retroscope.app/top-rated</loc>
+    <lastmod>2026-05-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <!-- Genre Categories -->
+  <url>
+    <loc>https://retroscope.app/web-series</loc>
+    <lastmod>2026-05-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://retroscope.app/documentaries</loc>
+    <lastmod>2026-05-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://retroscope.app/short-films</loc>
+    <lastmod>2026-05-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://retroscope.app/subscription</loc>
+    <lastmod>2026-05-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <!-- Dynamic Content Reels -->
+  <url><loc>https://retroscope.app/movies/mv-001</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://retroscope.app/movies/mv-002</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://retroscope.app/movies/mv-003</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://retroscope.app/movies/mv-004</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://retroscope.app/movies/mv-005</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://retroscope.app/movies/mv-006</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://retroscope.app/movies/mv-007</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://retroscope.app/movies/mv-008</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://retroscope.app/movies/mv-009</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://retroscope.app/movies/mv-010</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://retroscope.app/movies/mv-011</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://retroscope.app/movies/mv-012</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://retroscope.app/movies/mv-013</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://retroscope.app/movies/mv-014</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://retroscope.app/movies/mv-015</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://retroscope.app/movies/mv-016</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://retroscope.app/movies/mv-017</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://retroscope.app/movies/mv-018</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://retroscope.app/movies/mv-019</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://retroscope.app/movies/mv-020</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+</urlset>

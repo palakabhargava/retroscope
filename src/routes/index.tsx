@@ -24,19 +24,15 @@ export const Route = createFileRoute('/')({
   }),
 });
 
+import { HomeSkeleton } from '@/components/layout/PageSkeletons';
+import { SEOHelper } from '@/components/layout/SEOHelper';
+
 function Home() {
   const [mood, setMood] = useState<Mood>('night-vibes');
   const { data: contents = [], isLoading } = useContents();
 
   if (isLoading) {
-    return (
-      <div className="grid h-[80vh] place-items-center bg-background">
-        <div className="flex flex-col items-center gap-3">
-          <div className="h-10 w-10 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-          <p className="font-retro text-xs uppercase tracking-widest text-muted-foreground animate-pulse">Dimming lights, rolling reel...</p>
-        </div>
-      </div>
-    );
+    return <HomeSkeleton />;
   }
 
   // Choose a featured item. Prefer the 3rd movie, fallback to the 1st or a placeholder
@@ -45,8 +41,25 @@ function Home() {
   const getContentsByMood = (m: Mood) => contents.filter(x => x.moods.includes(m));
   const getContentsByRuntime = (max: number) => contents.filter(x => x.runtime <= max);
 
+  const homeSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "RetroScope",
+    "description": "Discover films through mood, time of night, and atmosphere. A vintage cinema OTT with Movie Taste DNA and scene heatmaps.",
+    "url": typeof window !== 'undefined' ? window.location.origin : 'https://retroscope.app',
+    "applicationCategory": "EntertainmentApplication"
+  };
+
   return (
     <div>
+      <SEOHelper 
+        title="RetroScope — Vintage Cinematic OTT Platform"
+        description="Discover films through mood, time of night, and atmosphere. Experience RetroScope - a dynamic full-stack vintage multiplex with Movie Taste DNA, timestepped emoji reactions, and live-rendered visual parameters."
+        ogType="website"
+        canonicalPath="/"
+        schema={homeSchema}
+      />
+
       {/* Hero */}
       {featured ? (
         <section className="relative h-[78vh] min-h-[520px] w-full overflow-hidden vignette" style={{ backgroundImage: featured.banner }}>

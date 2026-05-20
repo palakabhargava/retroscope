@@ -17,26 +17,43 @@ export const Route = createFileRoute('/documentaries')({
   }),
 });
 
+import { SpotlightSkeleton } from '@/components/layout/PageSkeletons';
+import { SEOHelper } from '@/components/layout/SEOHelper';
+
 function DocumentariesPage() {
   const { data: contents = [], isLoading } = useContents();
 
   const docs = contents.filter(c => c.type === 'documentary' || c.type === 'mockumentary');
   const featured = docs[0];
-  const remaining = docs.slice(1);
 
   if (isLoading) {
-    return (
-      <div className="grid h-[80vh] place-items-center bg-background">
-        <div className="flex flex-col items-center gap-3">
-          <div className="h-10 w-10 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-          <p className="font-retro text-xs uppercase tracking-widest text-muted-foreground animate-pulse">Dimming lights, rolling reel...</p>
-        </div>
-      </div>
-    );
+    return <SpotlightSkeleton />;
   }
+
+  const docsSchema = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "name": "Documentaries & Mockumentaries on RetroScope",
+    "description": "Explore gripping real-world chronicles and satirical mockumentaries on RetroScope.",
+    "numberOfItems": docs.length,
+    "itemListElement": docs.slice(0, 10).map((m, idx) => ({
+      "@type": "ListItem",
+      "position": idx + 1,
+      "name": m.title,
+      "url": typeof window !== 'undefined' ? `${window.location.origin}/movies/${m.id}` : `https://retroscope.app/movies/${m.id}`
+    }))
+  };
 
   return (
     <div className="min-h-screen bg-background text-foreground pb-20">
+      <SEOHelper 
+        title="Documentaries & Satirical Mockumentaries — RetroScope"
+        description="Explore gripping real-world chronicles and satirical mockumentaries on RetroScope. Experience real stories, biography features, and mock sitcoms."
+        ogType="website"
+        canonicalPath="/documentaries"
+        schema={docsSchema}
+      />
+
       {/* Featured Banner Section */}
       {featured ? (
         <section className="relative h-[65vh] min-h-[480px] w-full overflow-hidden vignette" style={{ backgroundImage: featured.banner }}>

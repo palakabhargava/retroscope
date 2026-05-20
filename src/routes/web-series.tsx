@@ -17,6 +17,9 @@ export const Route = createFileRoute('/web-series')({
   }),
 });
 
+import { SpotlightSkeleton } from '@/components/layout/PageSkeletons';
+import { SEOHelper } from '@/components/layout/SEOHelper';
+
 function WebSeriesPage() {
   const { data: contents = [], isLoading } = useContents();
 
@@ -24,18 +27,33 @@ function WebSeriesPage() {
   const featured = series[0];
 
   if (isLoading) {
-    return (
-      <div className="grid h-[80vh] place-items-center bg-background">
-        <div className="flex flex-col items-center gap-3">
-          <div className="h-10 w-10 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-          <p className="font-retro text-xs uppercase tracking-widest text-muted-foreground animate-pulse">Dimming lights, rolling reel...</p>
-        </div>
-      </div>
-    );
+    return <SpotlightSkeleton />;
   }
+
+  const seriesSchema = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "name": "Acclaimed Web Series on RetroScope",
+    "description": "Binge premium multi-season web series with deep characters and high stakes on RetroScope.",
+    "numberOfItems": series.length,
+    "itemListElement": series.slice(0, 10).map((m, idx) => ({
+      "@type": "ListItem",
+      "position": idx + 1,
+      "name": m.title,
+      "url": typeof window !== 'undefined' ? `${window.location.origin}/movies/${m.id}` : `https://retroscope.app/movies/${m.id}`
+    }))
+  };
 
   return (
     <div className="min-h-screen bg-background text-foreground pb-20">
+      <SEOHelper 
+        title="Premium Cinematic Web Series — RetroScope"
+        description="Binge premium multi-season web series with deep characters and high stakes on RetroScope. Classic projection room feel, high-fidelity metadata."
+        ogType="website"
+        canonicalPath="/web-series"
+        schema={seriesSchema}
+      />
+
       {/* Featured Spotlight Section */}
       {featured ? (
         <section className="relative h-[65vh] min-h-[480px] w-full overflow-hidden vignette" style={{ backgroundImage: featured.banner }}>

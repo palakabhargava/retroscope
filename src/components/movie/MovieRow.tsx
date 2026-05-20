@@ -10,9 +10,13 @@ export function MovieRow({ title, subtitle, movies }: { title: string; subtitle?
           {subtitle && <p className="font-retro text-xs uppercase tracking-widest text-muted-foreground">{subtitle}</p>}
         </div>
       </div>
-      <div className="-mx-4 overflow-x-auto px-4 pb-2">
+      <div className="-mx-4 overflow-x-auto px-4 pb-2 scrollbar-hide snap-x snap-mandatory flex-nowrap scroll-smooth">
         <div className="flex gap-5">
-          {movies.map(m => <div key={m.id} className="shrink-0"><PosterCard movie={m} /></div>)}
+          {movies.map(m => (
+            <div key={m.id} className="shrink-0 snap-start snap-always">
+              <PosterCard movie={m} />
+            </div>
+          ))}
         </div>
       </div>
     </section>

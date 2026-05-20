@@ -17,6 +17,9 @@ export const Route = createFileRoute('/short-films')({
   }),
 });
 
+import { SpotlightSkeleton } from '@/components/layout/PageSkeletons';
+import { SEOHelper } from '@/components/layout/SEOHelper';
+
 function ShortFilmsPage() {
   const { data: contents = [], isLoading } = useContents();
 
@@ -25,18 +28,33 @@ function ShortFilmsPage() {
   const featured = shorts[0];
 
   if (isLoading) {
-    return (
-      <div className="grid h-[80vh] place-items-center bg-background">
-        <div className="flex flex-col items-center gap-3">
-          <div className="h-10 w-10 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-          <p className="font-retro text-xs uppercase tracking-widest text-muted-foreground animate-pulse">Dimming lights, rolling reel...</p>
-        </div>
-      </div>
-    );
+    return <SpotlightSkeleton />;
   }
+
+  const shortsSchema = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "name": "Short Films & Videos on RetroScope",
+    "description": "Short, high-intensity cinematic masterpieces on RetroScope.",
+    "numberOfItems": shorts.length,
+    "itemListElement": shorts.slice(0, 10).map((m, idx) => ({
+      "@type": "ListItem",
+      "position": idx + 1,
+      "name": m.title,
+      "url": typeof window !== 'undefined' ? `${window.location.origin}/movies/${m.id}` : `https://retroscope.app/movies/${m.id}`
+    }))
+  };
 
   return (
     <div className="min-h-screen bg-background text-foreground pb-20">
+      <SEOHelper 
+        title="Short Films & Brief Masterpieces — RetroScope"
+        description="Explore short, high-intensity cinematic masterpieces. Perfect for quick sessions on RetroScope. Classic projection room feel, indie festival screenings."
+        ogType="website"
+        canonicalPath="/short-films"
+        schema={shortsSchema}
+      />
+
       {/* Featured Spotlight Section */}
       {featured ? (
         <section className="relative h-[65vh] min-h-[480px] w-full overflow-hidden vignette" style={{ backgroundImage: featured.banner }}>
