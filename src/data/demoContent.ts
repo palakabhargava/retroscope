@@ -19,7 +19,7 @@ export interface RawDemoContent {
   is_premium: boolean;
 }
 
-export const DEMO_CONTENT: RawDemoContent[] = [
+const CURATED_DEMO_CONTENT: RawDemoContent[] = [
   // ==================== MOVIES (20 Items) ====================
   {
     id: 'mv-001',
@@ -1874,7 +1874,371 @@ export const DEMO_CONTENT: RawDemoContent[] = [
     tagline: 'The golden voice of the reel.',
     poster: null,
     banner: null,
-    trailer_id: 'q8w7e6r5t4y',
     is_premium: true
   }
 ];
+
+// Helper to format synopsis as JSON string with custom universe metadata
+function serializeSynopsis(synopsisText: string, meta: any) {
+  return JSON.stringify({
+    synopsis: synopsisText,
+    ...meta
+  });
+}
+
+// Target quantities
+const TARGETS = {
+  movie: 100,
+  anime: 50,
+  web_series: 30,
+  documentary: 25,
+  short_film: 25,
+  kids: 20,
+  mature: 30,
+  short_video: 15,
+};
+
+// Seed lists
+const ANIME_TITLES = [
+  "Cyberpunk: Edgerunners", "Demon Slayer: Kimetsu no Yaiba", "Attack on Titan", "Spirited Away", 
+  "Jujutsu Kaisen", "Death Note", "My Hero Academia", "Your Name", "Fullmetal Alchemist: Brotherhood", 
+  "Neon Genesis Evangelion", "Naruto Shippuden", "One Piece", "Steins;Gate", "Hunter x Hunter", 
+  "Sword Art Online", "Tokyo Ghoul", "Chainsaw Man", "Bleach: Thousand-Year Blood War", "Cowboy Bebop", 
+  "Princess Mononoke", "Mob Psycho 100", "One Punch Man", "Code Geass", "Haikyu!!", 
+  "Vinland Saga", "Monogatari Series", "Fate/Zero", "Erased", "Your Lie in April", 
+  "Kaguya-sama: Love Is War", "Clannad: After Story", "Psycho-Pass", "Re:Zero - Starting Life in Another World", 
+  "No Game No Life", "Parasyte: The Maxim", "Black Clover", "Violet Evergarden", "Dr. STONE", 
+  "Assassination Classroom", "Blue Exorcist", "Anohana: The Flower We Saw That Day", "Food Wars!", 
+  "Tokyo Revengers", "The Promised Neverland", "Fruits Basket", "Made in Abyss", "Monster", 
+  "Ghost in the Shell", "Cowboy Bebop: Knockin' on Heaven's Door", "Akira"
+];
+
+const KIDS_TITLES = [
+  "Toy Story", "Frozen", "Despicable Me", "Finding Nemo", "Coco", 
+  "The Lion King", "Moana", "Kung Fu Panda", "Spider-Man: Into the Spider-Verse", "How to Train Your Dragon", 
+  "Shrek", "Monsters, Inc.", "The Incredibles", "Ratatouille", "WALL-E", 
+  "Up", "Zootopia", "Tangled", "Aladdin", "Beauty and the Beast"
+];
+
+const MATURE_TITLES = [
+  "Salaar: Ceasefire (Director's Cut)", "Tumbbad: Restricted Cut", "Gangs of Wasseypur (Unrated)", "Mirzapur: Dark Sagas", 
+  "Sacred Games: The Underworld", "Narcos: Colombia", "Mindhunter: Inside the Mind", "True Detective: Dark Noir", 
+  "Basic Instinct: Modern Thriller", "Se7en: Seven Deadly Sins", "Pulp Fiction", "The Godfather: Unrated", 
+  "Fight Club: Dystopian Cut", "Breaking Bad: Heisenberg", "Game of Thrones: Winter is Coming", "Spartacus: Blood and Sand", 
+  "House of Cards", "The Boys: Extreme Action", "American Psycho", "The Wolf of Wall Street", 
+  "Dexter: The Dark Passenger", "Hannibal: Psychological Horror", "Peaky Blinders: Birmingham Crime", "Ozark: Dark Money", 
+  "Westworld: Sci-Fi Dystopia", "Black Mirror: Tech Noir", "Chernobyl: Radioactive Drama", "Gomorrah: Italian Syndicate", 
+  "Suburra: Blood on Rome", "Boardwalk Empire"
+];
+
+const MOVIE_TITLES = [
+  "Inception", "The Dark Knight", "Interstellar", "Parasite", "Whiplash", "The Prestige", 
+  "Fight Club", "Pulp Fiction", "The Matrix", "Forrest Gump", "Goodfellas", "Gladiator", 
+  "The Departed", "The Green Mile", "Saving Private Ryan", "Schindler's List", "Se7en", 
+  "The Silence of the Lambs", "The Lion King", "The Shawshank Redemption"
+]; // additional movies seeds to fill up to 100
+
+// Generate expanded and enriched demo content
+const expandedList: RawDemoContent[] = [];
+
+// Process curated items and add JSON synopsis metadata
+CURATED_DEMO_CONTENT.forEach(item => {
+  let metadata: any = {
+    ageRating: item.type === 'mature' ? '18+' : (item.type === 'kids' ? 'G' : 'PG-13'),
+    sceneTimestamps: [
+      { time: 30, label: "Intro Scene" },
+      { time: 120, label: "Inciting Incident" },
+      { time: 240, label: "Climax" }
+    ]
+  };
+
+  if (item.type === 'web_series' || item.type === 'mockumentary') {
+    metadata.seasons = 2;
+    metadata.episodes = 20;
+    metadata.studio = "RetroScope Productions";
+  }
+
+  expandedList.push({
+    ...item,
+    synopsis: serializeSynopsis(item.synopsis, metadata)
+  });
+});
+
+// Now, dynamically generate to meet target counts for each category
+const getItemsOfType = (type: ContentType) => expandedList.filter(x => x.type === type);
+
+// 1. Generate Anime (50 items)
+ANIME_TITLES.forEach((title, idx) => {
+  const genres = [
+    ["Action", "Sci-Fi", "Cyberpunk"],
+    ["Action", "Fantasy", "Shonen"],
+    ["Action", "Drama", "Seinen"],
+    ["Drama", "Romance", "Fantasy"],
+    ["Mystery", "Thriller", "Psychological"],
+    ["Comedy", "Slice of Life", "Drama"]
+  ][idx % 6];
+
+  const moods: Mood[] = [
+    ['mind-blowing', 'night-vibes'],
+    ['thriller-rush', 'mind-blowing'],
+    ['emotional', 'comfort-watch'],
+    ['happy', 'comfort-watch'],
+    ['lonely', 'rainy-mood']
+  ][idx % 5] as Mood[];
+
+  const atmosphere: Atmosphere = ['sci-fi', 'drama', 'romance', 'horror', 'thriller', 'comedy'][idx % 6] as Atmosphere;
+
+  const metadata = {
+    studio: ["Trigger", "Ufotable", "MAPPA", "Studio Ghibli", "Madhouse", "Bones", "Toei Animation", "Kyoto Animation"][idx % 8],
+    seasons: [1, 2, 3, 4, 12][idx % 5],
+    episodes: [10, 12, 24, 26, 75, 100][idx % 6],
+    isDualAudio: idx % 2 === 0,
+    subtitles: ["English", "Japanese", "Spanish", "Hindi"],
+    audioLangs: idx % 2 === 0 ? ["Japanese", "English"] : ["Japanese"],
+    ageRating: idx % 10 === 0 ? '17+' : 'PG-13',
+    sceneTimestamps: [
+      { time: 10, label: "Opening Theme (OP)" },
+      { time: 180, label: "Midpoint Fight" },
+      { time: 300, label: "Ending Theme (ED)" }
+    ]
+  };
+
+  expandedList.push({
+    id: `an-${String(idx + 1).padStart(3, '0')}`,
+    title,
+    type: 'anime',
+    year: 2000 + (idx % 27),
+    runtime: 24, // typical episode length
+    genres,
+    moods,
+    atmosphere,
+    director: ["Studio Team", "Makoto Shinkai", "Hayao Miyazaki", "Shinichirō Watanabe"][idx % 4],
+    cast: ["Voice Actor A", "Voice Actor B", "Voice Actor C"],
+    synopsis: serializeSynopsis(
+      `An exceptional ${genres.join(' / ').toLowerCase()} anime production. Set in a breathtaking universe, this masterclass details the epic journeys of outstanding heroes battling cosmic and emotional hurdles. Ready for local play under the premium neon layout.`,
+      metadata
+    ),
+    tagline: `Enter the holographic anime realm of ${title}.`,
+    poster: null,
+    banner: null,
+    trailer_id: ["t8e7r6w5q4y", "sOEg_YZQsTI", "G62HrubdD6o", "BkVk5sPxgEI", "f_vbAtFSEc0", "JKa05nyUmuQ", "xvszmNXdM4w", "pKctjlxbFDA"][idx % 8],
+    is_premium: idx % 3 === 0
+  });
+});
+
+// 2. Generate Kids (20 items)
+KIDS_TITLES.forEach((title, idx) => {
+  const genres = ["Animation", "Family", "Adventure", "Comedy"];
+  const moods: Mood[] = [['happy', 'comfort-watch'], ['happy', 'emotional']][idx % 2] as Mood[];
+  const atmosphere: Atmosphere = ['comedy', 'drama', 'classic'][idx % 3] as Atmosphere;
+
+  const metadata = {
+    studio: ["Pixar", "Walt Disney Animation", "DreamWorks", "Illumination", "Sony Pictures Animation"][idx % 5],
+    ageRating: 'G',
+    subtitles: ["English", "Spanish", "Hindi"],
+    audioLangs: ["English", "Hindi", "Spanish"],
+    sceneTimestamps: [
+      { time: 5, label: "Playful Intro" },
+      { time: 150, label: "Fun Song" },
+      { time: 280, label: "Happy Ending" }
+    ]
+  };
+
+  expandedList.push({
+    id: `kd-${String(idx + 1).padStart(3, '0')}`,
+    title,
+    type: 'kids',
+    year: 1995 + (idx * 2) % 30,
+    runtime: 90 + (idx % 4) * 10,
+    genres,
+    moods,
+    atmosphere,
+    director: ["Director Kid", "Pixar Veteran", "Disney Veteran"][idx % 3],
+    cast: ["Voice A", "Voice B", "Voice C"],
+    synopsis: serializeSynopsis(
+      `A playful, heartwarming kids and family animated classic that tells an endearing adventure full of colorful characters, humorous setbacks, and valuable life lessons about friendship and bravery.`,
+      metadata
+    ),
+    tagline: `A delightful cinematic adventure for all ages.`,
+    poster: null,
+    banner: null,
+    trailer_id: ["aETNYyrqNYE", "xvszmNXdM4w", "vyX4ToS3J8Y", "BUjXzrgDdkc", "c25GZOAS7xY"][idx % 5],
+    is_premium: idx % 4 === 0
+  });
+});
+
+// 3. Generate Mature (30 items)
+MATURE_TITLES.forEach((title, idx) => {
+  const genres = [
+    ["Crime", "Drama", "Thriller"],
+    ["Action", "Thriller", "Noir"],
+    ["Horror", "Mystery", "Thriller"],
+    ["Dystopian", "Sci-Fi", "Thriller"]
+  ][idx % 4];
+
+  const moods: Mood[] = [
+    ['thriller-rush', 'night-vibes'],
+    ['lonely', 'rainy-mood', 'night-vibes']
+  ][idx % 2] as Mood[];
+
+  const atmosphere: Atmosphere = ['thriller', 'horror', 'sci-fi', 'drama'][idx % 4] as Atmosphere;
+
+  const metadata = {
+    ageRating: '18+',
+    subtitles: ["English", "Spanish"],
+    audioLangs: ["English", "Hindi"],
+    sceneTimestamps: [
+      { time: 20, label: "Dark Warning Scene" },
+      { time: 220, label: "Intense Investigation Climax" }
+    ]
+  };
+
+  expandedList.push({
+    id: `mt-${String(idx + 1).padStart(3, '0')}`,
+    title,
+    type: 'mature',
+    year: 1990 + (idx * 2) % 36,
+    runtime: 110 + (idx % 6) * 15,
+    genres,
+    moods,
+    atmosphere,
+    director: ["Noir Specialist", "Sandeep Reddy Vanga", "Anurag Kashyap", "David Fincher"][idx % 4],
+    cast: ["Lead Actor X", "Lead Actor Y", "Key Suspect Z"],
+    synopsis: serializeSynopsis(
+      `A dark, gritty, restricted-access thriller saga. Designed strictly for mature audiences, this atmospheric noir narrative details psychological twists, intense crime syndicates, and highly gripping clashes in deep shadows.`,
+      metadata
+    ),
+    tagline: `Step into the dark, smoky shadows. 18+ Verification Required.`,
+    poster: null,
+    banner: null,
+    trailer_id: ["Q8RR4DyGqqk", "5fPCkN1WQEs", "j-AkWDxpbXM", "BkVk5sPxgEI", "JKa05nyUmuQ", "RiA315GaspU"][idx % 6],
+    is_premium: idx % 2 === 0
+  });
+});
+
+// 4. Fill up movies to 100 items
+const existingMovies = getItemsOfType('movie');
+const movieDeficit = TARGETS.movie - existingMovies.length;
+for (let i = 0; i < movieDeficit; i++) {
+  const baseTitle = MOVIE_TITLES[i % MOVIE_TITLES.length];
+  const title = `${baseTitle} (Part ${Math.floor(i / MOVIE_TITLES.length) + 2})`;
+  const genres = ["Action", "Drama", "Thriller"];
+  const moods: Mood[] = [['thriller-rush', 'mind-blowing'], ['mind-blowing', 'night-vibes']][i % 2] as Mood[];
+  const atmosphere: Atmosphere = ['thriller', 'sci-fi', 'drama'][i % 3] as Atmosphere;
+
+  expandedList.push({
+    id: `mv-${String(existingMovies.length + i + 1).padStart(3, '0')}`,
+    title,
+    type: 'movie',
+    year: 2010 + (i % 16),
+    runtime: 120 + (i % 5) * 10,
+    genres,
+    moods,
+    atmosphere,
+    director: "Hollywood Veteran",
+    cast: ["Ensemble Cast Member A", "Ensemble Cast Member B"],
+    synopsis: serializeSynopsis(
+      `A high-stakes cinematic thriller in the global RetroScope catalog. This feature contains epic set-pieces, intense dialogue, and breath-taking VFX that keeps you on the edge of your seat.`,
+      { ageRating: 'PG-13' }
+    ),
+    tagline: "The projection continues...",
+    poster: null,
+    banner: null,
+    trailer_id: "YoHD9XEInc0",
+    is_premium: i % 3 === 0
+  });
+}
+
+// 5. Fill up web series to 30 items
+const existingSeries = getItemsOfType('web_series');
+const seriesDeficit = TARGETS.web_series - existingSeries.length;
+for (let i = 0; i < seriesDeficit; i++) {
+  const title = `Cinematic Chronicles: Chapter ${i + 1}`;
+  const genres = ["Drama", "Mystery"];
+  const moods: Mood[] = [['mind-blowing', 'comfort-watch'], ['night-vibes']][i % 2] as Mood[];
+  
+  expandedList.push({
+    id: `ws-${String(existingSeries.length + i + 1).padStart(3, '0')}`,
+    title,
+    type: 'web_series',
+    year: 2021 + (i % 5),
+    runtime: 45,
+    genres,
+    moods,
+    atmosphere: 'drama',
+    director: "Television Director",
+    cast: ["Drama Lead A", "Drama Lead B"],
+    synopsis: serializeSynopsis(
+      `An immersive web series detailing the dramatic lives, mysteries, and relationships of people trapped in a high-tech corporate environment.`,
+      { seasons: 2, episodes: 16 }
+    ),
+    tagline: "Every chapter reveals a new secret.",
+    poster: null,
+    banner: null,
+    trailer_id: "wtJPe1KSs2I",
+    is_premium: i % 2 === 0
+  });
+}
+
+// 6. Fill up documentaries to 25 items
+const existingDocs = getItemsOfType('documentary');
+const docsDeficit = TARGETS.documentary - existingDocs.length;
+for (let i = 0; i < docsDeficit; i++) {
+  const title = `Echoes of the Earth: Vol ${i + 1}`;
+  const genres = ["Documentary", "Nature"];
+  
+  expandedList.push({
+    id: `doc-${String(existingDocs.length + i + 1).padStart(3, '0')}`,
+    title,
+    type: 'documentary',
+    year: 2020 + (i % 6),
+    runtime: 60,
+    genres,
+    moods: ['comfort-watch', 'lonely'],
+    atmosphere: 'classic',
+    director: "Factual Filmmaker",
+    cast: ["Narrator Voice"],
+    synopsis: serializeSynopsis(
+      `A breathtaking, educational documentary exploring the unseen facets of nature, animal communication systems, and fragile ecosystems around the globe.`,
+      { ageRating: 'G' }
+    ),
+    tagline: "Listen to the whispers of the wild.",
+    poster: null,
+    banner: null,
+    trailer_id: "aETNYyrqNYE",
+    is_premium: false
+  });
+}
+
+// 7. Fill up short films to 25 items
+const existingSF = getItemsOfType('short_film');
+const sfDeficit = TARGETS.short_film - existingSF.length;
+for (let i = 0; i < sfDeficit; i++) {
+  const title = `Short Stories: Fragment ${i + 1}`;
+  
+  expandedList.push({
+    id: `sf-${String(existingSF.length + i + 1).padStart(3, '0')}`,
+    title,
+    type: 'short_film',
+    year: 2022 + (i % 4),
+    runtime: 15,
+    genres: ["Drama", "Indie"],
+    moods: ['emotional', 'lonely'],
+    atmosphere: 'drama',
+    director: "Indie Creator",
+    cast: ["Indie Actor A", "Indie Actor B"],
+    synopsis: serializeSynopsis(
+      `An award-winning, thought-provoking independent short film focusing on raw human conversations, quiet silences, and emotional reconciliations.`,
+      { ageRating: 'PG' }
+    ),
+    tagline: "Big emotions in short intervals.",
+    poster: null,
+    banner: null,
+    trailer_id: "f6y4d3c2b1a",
+    is_premium: i % 2 === 0
+  });
+}
+
+// Export the complete generated list
+export const DEMO_CONTENT = expandedList;
+

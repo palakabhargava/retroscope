@@ -1,6 +1,6 @@
 export type Mood = 'lonely' | 'happy' | 'emotional' | 'night-vibes' | 'mind-blowing' | 'thriller-rush' | 'rainy-mood' | 'comfort-watch';
 export type Atmosphere = 'horror' | 'romance' | 'sci-fi' | 'drama' | 'thriller' | 'comedy' | 'classic';
-export type ContentType = 'movie' | 'web_series' | 'short_film' | 'documentary' | 'mockumentary' | 'short_video';
+export type ContentType = 'movie' | 'web_series' | 'short_film' | 'documentary' | 'mockumentary' | 'short_video' | 'anime' | 'kids' | 'mature';
 
 export interface Movie {
   id: string;
@@ -21,6 +21,16 @@ export interface Movie {
   tagline: string;
   isPremium?: boolean;
   reactions?: { time: number; emoji: string; label: string }[];
+  
+  // Custom Universe Extensions
+  studio?: string;
+  seasons?: number;
+  episodes?: number;
+  isDualAudio?: boolean;
+  subtitles?: string[];
+  ageRating?: string;
+  audioLangs?: string[];
+  sceneTimestamps?: { time: number; label: string }[];
 }
 
 export const CONTENT_TYPES: { id: ContentType; label: string }[] = [
@@ -30,6 +40,9 @@ export const CONTENT_TYPES: { id: ContentType; label: string }[] = [
   { id: 'documentary', label: 'Documentaries' },
   { id: 'mockumentary', label: 'Mockumentaries' },
   { id: 'short_video', label: 'Short Videos' },
+  { id: 'anime', label: 'Anime' },
+  { id: 'kids', label: 'Kids & Family' },
+  { id: 'mature', label: 'Mature 18+' },
 ];
 
 export function mapDbToMovie(row: any, averageRating?: number): Movie {
@@ -43,6 +56,17 @@ export function mapDbToMovie(row: any, averageRating?: number): Movie {
     ? (isBannerUrl && !row.banner.startsWith('linear') ? `url('${row.banner}')` : row.banner)
     : (row.trailer_id ? `url('https://i.ytimg.com/vi/${row.trailer_id}/maxresdefault.jpg')` : `linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%)`);
 
+  let synopsis = row.synopsis || '';
+  let extraMeta: any = {};
+  if (typeof synopsis === 'string' && synopsis.trim().startsWith('{')) {
+    try {
+      extraMeta = JSON.parse(synopsis);
+      synopsis = extraMeta.synopsis || '';
+    } catch (e) {
+      console.warn("Failed to parse JSON synopsis metadata", e);
+    }
+  }
+
   return {
     id: row.id,
     title: row.title,
@@ -55,13 +79,23 @@ export function mapDbToMovie(row: any, averageRating?: number): Movie {
     rating: averageRating !== undefined ? +averageRating.toFixed(1) : 7.5,
     director: row.director || 'Unknown',
     cast: row.cast || [],
-    synopsis: row.synopsis || '',
+    synopsis: synopsis,
     poster: posterStyle,
     banner: bannerStyle,
     trailerId: row.trailer_id || undefined,
     tagline: row.tagline || '',
     isPremium: row.is_premium || false,
     reactions: [],
+    
+    // Extracted custom fields
+    studio: extraMeta.studio || undefined,
+    seasons: extraMeta.seasons !== undefined ? Number(extraMeta.seasons) : undefined,
+    episodes: extraMeta.episodes !== undefined ? Number(extraMeta.episodes) : undefined,
+    isDualAudio: extraMeta.isDualAudio !== undefined ? Boolean(extraMeta.isDualAudio) : undefined,
+    subtitles: extraMeta.subtitles || undefined,
+    ageRating: extraMeta.ageRating || undefined,
+    audioLangs: extraMeta.audioLangs || undefined,
+    sceneTimestamps: extraMeta.sceneTimestamps || undefined,
   };
 }
 

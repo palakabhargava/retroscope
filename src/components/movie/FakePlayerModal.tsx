@@ -39,6 +39,10 @@ export function FakePlayerModal({ movie, open, onClose }: { movie: Movie | null;
   const [bassBoost, setBassBoost] = useState(false);
   const [surroundSound, setSurroundSound] = useState(true);
   const [audioPreset, setAudioPreset] = useState('Classic Cinema');
+  const [trailerLang, setTrailerLang] = useState(() => localStorage.getItem('retroscope_trailer_lang') || 'English (Original)');
+  const [eqBass, setEqBass] = useState(0);
+  const [eqMid, setEqMid] = useState(0);
+  const [eqTreble, setEqTreble] = useState(0);
   
   // Subtitles State
   const [subLanguage, setSubLanguage] = useState('English');
@@ -51,6 +55,8 @@ export function FakePlayerModal({ movie, open, onClose }: { movie: Movie | null;
   const [hdrSimulation, setHdrSimulation] = useState(true);
   const [brightness, setBrightness] = useState(100);
   const [contrast, setContrast] = useState(100);
+  const [saturation, setSaturation] = useState(100);
+  const [filmTint, setFilmTint] = useState(0);
   const [cinematicFilter, setCinematicFilter] = useState<'none' | 'sepia' | 'techno' | 'noir' | 'warm'>('none');
 
   // Inactivity Auto-fade State
@@ -141,7 +147,7 @@ export function FakePlayerModal({ movie, open, onClose }: { movie: Movie | null;
   };
 
   const getVideoFilterString = () => {
-    let base = `brightness(${brightness}%) contrast(${contrast}%)`;
+    let base = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%) hue-rotate(${filmTint}deg)`;
     if (vhs) base += ` saturate(0.85) contrast(1.15)`;
     if (hdrSimulation) base += ` saturate(1.3) contrast(1.1) brightness(105%)`;
     
@@ -152,6 +158,17 @@ export function FakePlayerModal({ movie, open, onClose }: { movie: Movie | null;
       case 'warm': base += ' sepia(0.25) saturate(1.2) contrast(1.05)'; break;
     }
     return base;
+  };
+
+  const handleLanguageChange = (lang: string) => {
+    setTrailerLang(lang);
+    localStorage.setItem('retroscope_trailer_lang', lang);
+    setBuffering(true);
+    toast.info(`Swapping audio stream to regional track: ${lang}...`, { id: 'lang-toast' });
+    setTimeout(() => {
+      setBuffering(false);
+      toast.success(`Synchronized audio feed [${lang}]!`, { id: 'lang-toast' });
+    }, 1000);
   };
 
   const toggleFullscreen = () => {
@@ -251,6 +268,15 @@ export function FakePlayerModal({ movie, open, onClose }: { movie: Movie | null;
                     }}
                   >
                     [{subLanguage}] Simulated subtitle feed at {subLatency.toFixed(1)}s synchronization offset.
+                  </span>
+                </div>
+              )}
+
+              {/* Active Trailer Audio track status overlay */}
+              {trailerLang && (
+                <div className="absolute bottom-24 left-6 z-30 pointer-events-none text-left">
+                  <span className="px-2 py-0.5 bg-black/80 text-primary border border-primary/30 rounded font-retro text-[8px] uppercase tracking-widest">
+                    Audio: {trailerLang}
                   </span>
                 </div>
               )}
@@ -558,16 +584,44 @@ export function FakePlayerModal({ movie, open, onClose }: { movie: Movie | null;
                     {activeTab === 'audio' && (
                       <div className="space-y-4">
                         <h4 className="font-display text-xs font-black text-foreground flex items-center gap-1">
-                          <Volume2 className="h-3.5 w-3.5 text-primary" /> Audio Equalizers
+                          <Volume2 className="h-3.5 w-3.5 text-primary" /> Audio & Regional Tracks
                         </h4>
 
                         <div className="space-y-2.5">
+                          <div>
+                            <label className="block font-retro text-[8px] uppercase tracking-widest text-muted-foreground mb-1">Trailer Audio Track</label>
+                            <select 
+                              value={trailerLang} 
+                              onChange={e => handleLanguageChange(e.target.value)}
+                              className="w-full bg-black/60 text-xs border border-white/10 px-2 py-1.5 rounded-sm focus:outline-none focus:border-primary text-foreground"
+                            >
+                              <option>English (Original)</option>
+                              <option>Hindi (हिंदी Dub)</option>
+                              <option>Telugu (తెలుగు Dub)</option>
+                              <option>Tamil (தமிழ் Dub)</option>
+                              <option>Japanese (日本語 Dual)</option>
+                              <option>Korean (한국어 Sub)</option>
+                              <option>Spanish (Español)</option>
+                            </select>
+                          </div>
+
                           <div>
                             <label className="block font-retro text-[8px] uppercase tracking-widest text-muted-foreground mb-1">Equalizer Preset</label>
                             <select 
                               value={audioPreset} 
                               onChange={e => {
                                 setAudioPreset(e.target.value);
+                                if (e.target.value === 'Dolby Atmos Enhanced') {
+                                  setEqBass(6); setEqMid(2); setEqTreble(5);
+                                } else if (e.target.value === 'Action Blast Booster') {
+                                  setEqBass(9); setEqMid(-2); setEqTreble(6);
+                                } else if (e.target.value === 'Vocal Clear & Mids') {
+                                  setEqBass(-2); setEqMid(8); setEqTreble(2);
+                                } else if (e.target.value === 'Night Quiet Mode') {
+                                  setEqBass(-6); setEqMid(0); setEqTreble(-3);
+                                } else {
+                                  setEqBass(0); setEqMid(0); setEqTreble(0);
+                                }
                                 toast.info(`Equalizer profile set to: ${e.target.value}`);
                               }}
                               className="w-full bg-black/60 text-xs border border-white/10 px-2 py-1.5 rounded-sm focus:outline-none focus:border-primary text-foreground"
@@ -580,7 +634,36 @@ export function FakePlayerModal({ movie, open, onClose }: { movie: Movie | null;
                             </select>
                           </div>
 
-                          <div className="space-y-2">
+                          {/* Decibel Eq Sliders */}
+                          <div className="space-y-2 border-t border-white/5 pt-3">
+                            <p className="font-retro text-[8px] uppercase tracking-widest text-muted-foreground mb-1">Fine Decibel Tuning</p>
+                            <div className="space-y-1.5">
+                              <div className="flex justify-between text-[10px] text-zinc-400 font-mono">
+                                <span>Bass (80Hz)</span>
+                                <span className={eqBass > 0 ? "text-primary" : ""}>{eqBass > 0 ? `+${eqBass}` : eqBass} dB</span>
+                              </div>
+                              <input type="range" min="-10" max="10" value={eqBass} onChange={e => setEqBass(Number(e.target.value))}
+                                className="w-full h-1 bg-white/20 accent-primary cursor-pointer appearance-none rounded-lg"/>
+                            </div>
+                            <div className="space-y-1.5">
+                              <div className="flex justify-between text-[10px] text-zinc-400 font-mono">
+                                <span>Mids (1kHz)</span>
+                                <span className={eqMid > 0 ? "text-primary" : ""}>{eqMid > 0 ? `+${eqMid}` : eqMid} dB</span>
+                              </div>
+                              <input type="range" min="-10" max="10" value={eqMid} onChange={e => setEqMid(Number(e.target.value))}
+                                className="w-full h-1 bg-white/20 accent-primary cursor-pointer appearance-none rounded-lg"/>
+                            </div>
+                            <div className="space-y-1.5">
+                              <div className="flex justify-between text-[10px] text-zinc-400 font-mono">
+                                <span>Treble (8kHz)</span>
+                                <span className={eqTreble > 0 ? "text-primary" : ""}>{eqTreble > 0 ? `+${eqTreble}` : eqTreble} dB</span>
+                              </div>
+                              <input type="range" min="-10" max="10" value={eqTreble} onChange={e => setEqTreble(Number(e.target.value))}
+                                className="w-full h-1 bg-white/20 accent-primary cursor-pointer appearance-none rounded-lg"/>
+                            </div>
+                          </div>
+
+                          <div className="space-y-2 pt-2">
                             <label className="flex items-center gap-2 text-[11px] text-muted-foreground cursor-pointer hover:text-foreground">
                               <input 
                                 type="checkbox" 
@@ -621,7 +704,7 @@ export function FakePlayerModal({ movie, open, onClose }: { movie: Movie | null;
                               />
                             ))}
                           </div>
-                          <p className="text-[7px] text-muted-foreground/80">Active stream track: Dolby Digital Plus Atmos</p>
+                          <p className="text-[7px] text-muted-foreground/80 font-mono">Audio Profile: Dolby Digital + Atmos | Latency: 0ms</p>
                         </div>
                       </div>
                     )}
@@ -745,6 +828,20 @@ export function FakePlayerModal({ movie, open, onClose }: { movie: Movie | null;
                               <label className="font-retro text-[8px] uppercase tracking-widest text-muted-foreground">Contrast ({contrast}%)</label>
                             </div>
                             <input type="range" min="70" max="130" value={contrast} onChange={e => setContrast(Number(e.target.value))}
+                              className="w-full h-1 bg-white/20 accent-primary cursor-pointer appearance-none rounded-lg mt-1"/>
+                          </div>
+                          <div>
+                            <div className="flex justify-between">
+                              <label className="font-retro text-[8px] uppercase tracking-widest text-muted-foreground">Saturation ({saturation}%)</label>
+                            </div>
+                            <input type="range" min="50" max="150" value={saturation} onChange={e => setSaturation(Number(e.target.value))}
+                              className="w-full h-1 bg-white/20 accent-primary cursor-pointer appearance-none rounded-lg mt-1"/>
+                          </div>
+                          <div>
+                            <div className="flex justify-between">
+                              <label className="font-retro text-[8px] uppercase tracking-widest text-muted-foreground">Film Tint ({filmTint >= 0 ? `+${filmTint}` : filmTint}°)</label>
+                            </div>
+                            <input type="range" min="-30" max="30" value={filmTint} onChange={e => setFilmTint(Number(e.target.value))}
                               className="w-full h-1 bg-white/20 accent-primary cursor-pointer appearance-none rounded-lg mt-1"/>
                           </div>
                         </div>

@@ -7,6 +7,7 @@ import { MobileNav } from "@/components/layout/MobileNav";
 import { Footer } from "@/components/layout/Footer";
 import { FilmGrain } from "@/components/cinematic/FilmGrain";
 import { Toaster } from "@/components/ui/sonner";
+import { AtmosphereProvider } from "@/hooks/useAtmosphere";
 
 function NotFoundComponent() {
   return (
@@ -47,7 +48,9 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <Layout />
+        <AtmosphereProvider>
+          <Layout />
+        </AtmosphereProvider>
       </AuthProvider>
     </QueryClientProvider>
   );

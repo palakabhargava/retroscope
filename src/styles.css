@@ -139,8 +139,20 @@
 }
 
 @layer base {
-  * { border-color: var(--color-border); }
-  html, body { background-color: var(--color-background); color: var(--color-foreground); font-family: var(--font-body); }
+  * { 
+    border-color: var(--color-border); 
+    transition: background-color 0.8s cubic-bezier(0.25, 1, 0.5, 1),
+                border-color 0.8s cubic-bezier(0.25, 1, 0.5, 1),
+                color 0.8s cubic-bezier(0.25, 1, 0.5, 1),
+                box-shadow 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+  }
+  html, body { 
+    background-color: var(--color-background); 
+    color: var(--color-foreground); 
+    font-family: var(--font-body); 
+    transition: background-color 0.8s cubic-bezier(0.25, 1, 0.5, 1),
+                color 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+  }
   h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.01em; }
   ::selection { background: var(--primary); color: var(--primary-foreground); }
 }
