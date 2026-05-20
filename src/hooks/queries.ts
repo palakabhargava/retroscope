@@ -280,7 +280,7 @@ export function useUserRating(contentId: string, userId?: string) {
         .from('ratings')
         .select('rating')
         .eq('content_id', contentId)
-        .eq('user_id', userId)
+        .eq('user_id', userId!)
         .maybeSingle();
       if (error) throw error;
       return data?.rating || null;

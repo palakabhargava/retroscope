@@ -64,9 +64,48 @@ function Login() {
               className="w-full rounded-sm bg-primary py-3 font-retro text-xs uppercase tracking-widest text-primary-foreground hover:bg-hover-glow disabled:opacity-60">
               {busy ? 'Threading the reel…' : 'Sign in'}
             </button>
-            <div className="flex items-center justify-between font-retro text-[10px] uppercase tracking-widest text-muted-foreground">
+            <div className="flex items-center justify-between font-retro text-[10px] uppercase tracking-widest text-muted-foreground pt-2">
               <Link to="/forgot-password" className="hover:text-primary">Forgot password</Link>
               <Link to="/signup" className="hover:text-primary">Create account →</Link>
+            </div>
+            
+            {/* Quick Demo Access */}
+            <div className="mt-6 border-t border-border/60 pt-4 text-center">
+              <p className="font-retro text-[10px] uppercase tracking-[0.2em] text-primary mb-3">— Recruiter Quick Access —</p>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  disabled={busy}
+                  onClick={async () => {
+                    setBusy(true);
+                    try {
+                      await login('admin@retroscope.app', 'admin123');
+                      nav({ to: '/' });
+                    } catch (_) {}
+                    finally { setBusy(false); }
+                  }}
+                  className="rounded-sm border border-amber-500/40 bg-amber-950/20 px-3 py-2 text-left font-retro text-[9px] uppercase tracking-widest text-amber-400 hover:bg-amber-500/20 transition-all hover:border-amber-500"
+                >
+                  👑 Demo Admin
+                  <span className="block text-[7px] text-amber-500/60 lowercase mt-0.5 tracking-normal">operations console</span>
+                </button>
+                <button
+                  type="button"
+                  disabled={busy}
+                  onClick={async () => {
+                    setBusy(true);
+                    try {
+                      await login('guest@retroscope.app', 'guest123');
+                      nav({ to: '/' });
+                    } catch (_) {}
+                    finally { setBusy(false); }
+                  }}
+                  className="rounded-sm border border-sky-500/40 bg-sky-950/20 px-3 py-2 text-left font-retro text-[9px] uppercase tracking-widest text-sky-400 hover:bg-sky-500/20 transition-all hover:border-sky-500"
+                >
+                  🍿 Demo User
+                  <span className="block text-[7px] text-sky-500/60 lowercase mt-0.5 tracking-normal">cinematic catalog</span>
+                </button>
+              </div>
             </div>
           </form>
         </div>

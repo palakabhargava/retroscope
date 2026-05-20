@@ -133,7 +133,9 @@ export const posterUrl = (title: string, fallback?: string): string | undefined 
 
 export const MOVIES: Movie[] = TITLES.map((t, i) => ({
   id: `mv-${String(i + 1).padStart(3, '0')}`,
-  title: t.title, year: t.year, runtime: t.runtime,
+  title: t.title,
+  type: 'movie',
+  year: t.year, runtime: t.runtime,
   genres: t.genres, moods: t.moods, atmosphere: t.atmosphere,
   director: t.director, cast: t.cast, tagline: t.tagline,
   trailerId: t.trailerId,

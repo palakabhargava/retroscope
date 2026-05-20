@@ -31,7 +31,6 @@ import { Route as AuthenticatedDnaRouteImport } from './routes/_authenticated/dn
 import { Route as AuthenticatedComplaintsRouteImport } from './routes/_authenticated/complaints'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
-import { Route as ApiPublicSeedAdminRouteImport } from './routes/api/public/seed-admin'
 import { Route as AuthenticatedHeatmapMovieIdRouteImport } from './routes/_authenticated/heatmap.$movieId'
 import { Route as AuthenticatedAdminThemesRouteImport } from './routes/_authenticated/admin/themes'
 import { Route as AuthenticatedAdminSchedulerRouteImport } from './routes/_authenticated/admin/scheduler'
@@ -152,11 +151,6 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
-const ApiPublicSeedAdminRoute = ApiPublicSeedAdminRouteImport.update({
-  id: '/api/public/seed-admin',
-  path: '/api/public/seed-admin',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AuthenticatedHeatmapMovieIdRoute =
   AuthenticatedHeatmapMovieIdRouteImport.update({
     id: '/heatmap/$movieId',
@@ -241,7 +235,6 @@ export interface FileRoutesByFullPath {
   '/admin/scheduler': typeof AuthenticatedAdminSchedulerRoute
   '/admin/themes': typeof AuthenticatedAdminThemesRoute
   '/heatmap/$movieId': typeof AuthenticatedHeatmapMovieIdRoute
-  '/api/public/seed-admin': typeof ApiPublicSeedAdminRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRoutesByTo {
@@ -273,7 +266,6 @@ export interface FileRoutesByTo {
   '/admin/scheduler': typeof AuthenticatedAdminSchedulerRoute
   '/admin/themes': typeof AuthenticatedAdminThemesRoute
   '/heatmap/$movieId': typeof AuthenticatedHeatmapMovieIdRoute
-  '/api/public/seed-admin': typeof ApiPublicSeedAdminRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRoutesById {
@@ -308,7 +300,6 @@ export interface FileRoutesById {
   '/_authenticated/admin/scheduler': typeof AuthenticatedAdminSchedulerRoute
   '/_authenticated/admin/themes': typeof AuthenticatedAdminThemesRoute
   '/_authenticated/heatmap/$movieId': typeof AuthenticatedHeatmapMovieIdRoute
-  '/api/public/seed-admin': typeof ApiPublicSeedAdminRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRouteTypes {
@@ -343,7 +334,6 @@ export interface FileRouteTypes {
     | '/admin/scheduler'
     | '/admin/themes'
     | '/heatmap/$movieId'
-    | '/api/public/seed-admin'
     | '/admin/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -375,7 +365,6 @@ export interface FileRouteTypes {
     | '/admin/scheduler'
     | '/admin/themes'
     | '/heatmap/$movieId'
-    | '/api/public/seed-admin'
     | '/admin'
   id:
     | '__root__'
@@ -409,7 +398,6 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/scheduler'
     | '/_authenticated/admin/themes'
     | '/_authenticated/heatmap/$movieId'
-    | '/api/public/seed-admin'
     | '/_authenticated/admin/'
   fileRoutesById: FileRoutesById
 }
@@ -428,7 +416,6 @@ export interface RootRouteChildren {
   TrendingRoute: typeof TrendingRoute
   WebSeriesRoute: typeof WebSeriesRoute
   MoviesMovieIdRoute: typeof MoviesMovieIdRoute
-  ApiPublicSeedAdminRoute: typeof ApiPublicSeedAdminRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -587,13 +574,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
-    '/api/public/seed-admin': {
-      id: '/api/public/seed-admin'
-      path: '/api/public/seed-admin'
-      fullPath: '/api/public/seed-admin'
-      preLoaderRoute: typeof ApiPublicSeedAdminRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/_authenticated/heatmap/$movieId': {
       id: '/_authenticated/heatmap/$movieId'
       path: '/heatmap/$movieId'
@@ -728,7 +708,6 @@ const rootRouteChildren: RootRouteChildren = {
   TrendingRoute: TrendingRoute,
   WebSeriesRoute: WebSeriesRoute,
   MoviesMovieIdRoute: MoviesMovieIdRoute,
-  ApiPublicSeedAdminRoute: ApiPublicSeedAdminRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

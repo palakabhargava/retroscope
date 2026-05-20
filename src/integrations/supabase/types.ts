@@ -179,6 +179,183 @@ export type Database = {
         }
         Relationships: []
       }
+      content: {
+        Row: {
+          id: string
+          title: string
+          type: string
+          year: number
+          runtime: number
+          genres: string[]
+          moods: string[]
+          atmosphere: string
+          director: string
+          cast: string[]
+          synopsis: string
+          tagline: string
+          poster: string | null
+          banner: string | null
+          trailer_id: string | null
+          is_premium: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id: string
+          title: string
+          type: string
+          year: number
+          runtime: number
+          genres?: string[]
+          moods?: string[]
+          atmosphere: string
+          director: string
+          cast?: string[]
+          synopsis: string
+          tagline: string
+          poster?: string | null
+          banner?: string | null
+          trailer_id?: string | null
+          is_premium?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          title?: string
+          type?: string
+          year?: number
+          runtime?: number
+          genres?: string[]
+          moods?: string[]
+          atmosphere?: string
+          director?: string
+          cast?: string[]
+          synopsis?: string
+          tagline?: string
+          poster?: string | null
+          banner?: string | null
+          trailer_id?: string | null
+          is_premium?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      ratings: {
+        Row: {
+          id: string
+          content_id: string
+          user_id: string
+          rating: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          content_id: string
+          user_id: string
+          rating: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          content_id?: string
+          user_id?: string
+          rating?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      reviews: {
+        Row: {
+          id: string
+          content_id: string
+          user_id: string
+          body: string
+          status: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          content_id: string
+          user_id: string
+          body: string
+          status?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          content_id?: string
+          user_id?: string
+          body?: string
+          status?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      reactions: {
+        Row: {
+          id: string
+          content_id: string
+          user_id: string
+          emoji: string
+          timestamp: number
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          content_id: string
+          user_id: string
+          emoji: string
+          timestamp: number
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          content_id?: string
+          user_id?: string
+          emoji?: string
+          timestamp?: number
+          created_at?: string
+        }
+        Relationships: []
+      }
+      analytics: {
+        Row: {
+          id: string
+          content_id: string
+          user_id: string | null
+          event_type: string
+          progress_pct: number
+          ip_address: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          content_id: string
+          user_id?: string | null
+          event_type?: string
+          progress_pct?: number
+          ip_address?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          content_id?: string
+          user_id?: string | null
+          event_type?: string
+          progress_pct?: number
+          ip_address?: string | null
+          created_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

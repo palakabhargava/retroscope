@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { CONTENT_TYPES, type ContentType, type Atmosphere, type Mood } from '@/data/movies';
 import { Plus, Pencil, Trash2, X } from 'lucide-react';
 import { useContents, useAdminCreateContent, useAdminUpdateContent, useAdminDeleteContent } from '@/hooks/queries';
+import { motion } from 'framer-motion';
 
 export const Route = createFileRoute('/_authenticated/admin/movies')({ component: AdminMovies });
 
