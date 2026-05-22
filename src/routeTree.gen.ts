@@ -17,12 +17,26 @@ import { Route as SignupRouteImport } from './routes/signup'
 import { Route as ShortFilmsRouteImport } from './routes/short-films'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as MatureRouteImport } from './routes/mature'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as KidsRouteImport } from './routes/kids'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as DocumentariesRouteImport } from './routes/documentaries'
+import { Route as AnimeRouteImport } from './routes/anime'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as MoviesMovieIdRouteImport } from './routes/movies.$movieId'
+import { Route as MatureTrendingRouteImport } from './routes/mature.trending'
+import { Route as MaturePsychologicalRouteImport } from './routes/mature.psychological'
+import { Route as MatureNoirRouteImport } from './routes/mature.noir'
+import { Route as MatureAnimeRouteImport } from './routes/mature.anime'
+import { Route as KidsMoviesRouteImport } from './routes/kids.movies'
+import { Route as KidsCartoonsRouteImport } from './routes/kids.cartoons'
+import { Route as KidsAnimeRouteImport } from './routes/kids.anime'
+import { Route as AnimeTrendingRouteImport } from './routes/anime.trending'
+import { Route as AnimeTopRatedRouteImport } from './routes/anime.top-rated'
+import { Route as AnimeGenresRouteImport } from './routes/anime.genres'
+import { Route as AnimeAnimeIdRouteImport } from './routes/anime.$animeId'
 import { Route as AuthenticatedWatchlistRouteImport } from './routes/_authenticated/watchlist'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
@@ -81,9 +95,19 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
   path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MatureRoute = MatureRouteImport.update({
+  id: '/mature',
+  path: '/mature',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const KidsRoute = KidsRouteImport.update({
+  id: '/kids',
+  path: '/kids',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
@@ -94,6 +118,11 @@ const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
 const DocumentariesRoute = DocumentariesRouteImport.update({
   id: '/documentaries',
   path: '/documentaries',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AnimeRoute = AnimeRouteImport.update({
+  id: '/anime',
+  path: '/anime',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
@@ -109,6 +138,61 @@ const MoviesMovieIdRoute = MoviesMovieIdRouteImport.update({
   id: '/movies/$movieId',
   path: '/movies/$movieId',
   getParentRoute: () => rootRouteImport,
+} as any)
+const MatureTrendingRoute = MatureTrendingRouteImport.update({
+  id: '/trending',
+  path: '/trending',
+  getParentRoute: () => MatureRoute,
+} as any)
+const MaturePsychologicalRoute = MaturePsychologicalRouteImport.update({
+  id: '/psychological',
+  path: '/psychological',
+  getParentRoute: () => MatureRoute,
+} as any)
+const MatureNoirRoute = MatureNoirRouteImport.update({
+  id: '/noir',
+  path: '/noir',
+  getParentRoute: () => MatureRoute,
+} as any)
+const MatureAnimeRoute = MatureAnimeRouteImport.update({
+  id: '/anime',
+  path: '/anime',
+  getParentRoute: () => MatureRoute,
+} as any)
+const KidsMoviesRoute = KidsMoviesRouteImport.update({
+  id: '/movies',
+  path: '/movies',
+  getParentRoute: () => KidsRoute,
+} as any)
+const KidsCartoonsRoute = KidsCartoonsRouteImport.update({
+  id: '/cartoons',
+  path: '/cartoons',
+  getParentRoute: () => KidsRoute,
+} as any)
+const KidsAnimeRoute = KidsAnimeRouteImport.update({
+  id: '/anime',
+  path: '/anime',
+  getParentRoute: () => KidsRoute,
+} as any)
+const AnimeTrendingRoute = AnimeTrendingRouteImport.update({
+  id: '/trending',
+  path: '/trending',
+  getParentRoute: () => AnimeRoute,
+} as any)
+const AnimeTopRatedRoute = AnimeTopRatedRouteImport.update({
+  id: '/top-rated',
+  path: '/top-rated',
+  getParentRoute: () => AnimeRoute,
+} as any)
+const AnimeGenresRoute = AnimeGenresRouteImport.update({
+  id: '/genres',
+  path: '/genres',
+  getParentRoute: () => AnimeRoute,
+} as any)
+const AnimeAnimeIdRoute = AnimeAnimeIdRouteImport.update({
+  id: '/$animeId',
+  path: '/$animeId',
+  getParentRoute: () => AnimeRoute,
 } as any)
 const AuthenticatedWatchlistRoute = AuthenticatedWatchlistRouteImport.update({
   id: '/watchlist',
@@ -207,9 +291,12 @@ const AuthenticatedAdminBroadcastRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/anime': typeof AnimeRouteWithChildren
   '/documentaries': typeof DocumentariesRoute
   '/forgot-password': typeof ForgotPasswordRoute
+  '/kids': typeof KidsRouteWithChildren
   '/login': typeof LoginRoute
+  '/mature': typeof MatureRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
   '/search': typeof SearchRoute
   '/short-films': typeof ShortFilmsRoute
@@ -225,6 +312,17 @@ export interface FileRoutesByFullPath {
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/watchlist': typeof AuthenticatedWatchlistRoute
+  '/anime/$animeId': typeof AnimeAnimeIdRoute
+  '/anime/genres': typeof AnimeGenresRoute
+  '/anime/top-rated': typeof AnimeTopRatedRoute
+  '/anime/trending': typeof AnimeTrendingRoute
+  '/kids/anime': typeof KidsAnimeRoute
+  '/kids/cartoons': typeof KidsCartoonsRoute
+  '/kids/movies': typeof KidsMoviesRoute
+  '/mature/anime': typeof MatureAnimeRoute
+  '/mature/noir': typeof MatureNoirRoute
+  '/mature/psychological': typeof MaturePsychologicalRoute
+  '/mature/trending': typeof MatureTrendingRoute
   '/movies/$movieId': typeof MoviesMovieIdRoute
   '/admin/broadcast': typeof AuthenticatedAdminBroadcastRoute
   '/admin/complaints': typeof AuthenticatedAdminComplaintsRoute
@@ -239,9 +337,12 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/anime': typeof AnimeRouteWithChildren
   '/documentaries': typeof DocumentariesRoute
   '/forgot-password': typeof ForgotPasswordRoute
+  '/kids': typeof KidsRouteWithChildren
   '/login': typeof LoginRoute
+  '/mature': typeof MatureRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
   '/search': typeof SearchRoute
   '/short-films': typeof ShortFilmsRoute
@@ -256,6 +357,17 @@ export interface FileRoutesByTo {
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/watchlist': typeof AuthenticatedWatchlistRoute
+  '/anime/$animeId': typeof AnimeAnimeIdRoute
+  '/anime/genres': typeof AnimeGenresRoute
+  '/anime/top-rated': typeof AnimeTopRatedRoute
+  '/anime/trending': typeof AnimeTrendingRoute
+  '/kids/anime': typeof KidsAnimeRoute
+  '/kids/cartoons': typeof KidsCartoonsRoute
+  '/kids/movies': typeof KidsMoviesRoute
+  '/mature/anime': typeof MatureAnimeRoute
+  '/mature/noir': typeof MatureNoirRoute
+  '/mature/psychological': typeof MaturePsychologicalRoute
+  '/mature/trending': typeof MatureTrendingRoute
   '/movies/$movieId': typeof MoviesMovieIdRoute
   '/admin/broadcast': typeof AuthenticatedAdminBroadcastRoute
   '/admin/complaints': typeof AuthenticatedAdminComplaintsRoute
@@ -272,9 +384,12 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
+  '/anime': typeof AnimeRouteWithChildren
   '/documentaries': typeof DocumentariesRoute
   '/forgot-password': typeof ForgotPasswordRoute
+  '/kids': typeof KidsRouteWithChildren
   '/login': typeof LoginRoute
+  '/mature': typeof MatureRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
   '/search': typeof SearchRoute
   '/short-films': typeof ShortFilmsRoute
@@ -290,6 +405,17 @@ export interface FileRoutesById {
   '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/watchlist': typeof AuthenticatedWatchlistRoute
+  '/anime/$animeId': typeof AnimeAnimeIdRoute
+  '/anime/genres': typeof AnimeGenresRoute
+  '/anime/top-rated': typeof AnimeTopRatedRoute
+  '/anime/trending': typeof AnimeTrendingRoute
+  '/kids/anime': typeof KidsAnimeRoute
+  '/kids/cartoons': typeof KidsCartoonsRoute
+  '/kids/movies': typeof KidsMoviesRoute
+  '/mature/anime': typeof MatureAnimeRoute
+  '/mature/noir': typeof MatureNoirRoute
+  '/mature/psychological': typeof MaturePsychologicalRoute
+  '/mature/trending': typeof MatureTrendingRoute
   '/movies/$movieId': typeof MoviesMovieIdRoute
   '/_authenticated/admin/broadcast': typeof AuthenticatedAdminBroadcastRoute
   '/_authenticated/admin/complaints': typeof AuthenticatedAdminComplaintsRoute
@@ -306,9 +432,12 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/anime'
     | '/documentaries'
     | '/forgot-password'
+    | '/kids'
     | '/login'
+    | '/mature'
     | '/reset-password'
     | '/search'
     | '/short-films'
@@ -324,6 +453,17 @@ export interface FileRouteTypes {
     | '/notifications'
     | '/profile'
     | '/watchlist'
+    | '/anime/$animeId'
+    | '/anime/genres'
+    | '/anime/top-rated'
+    | '/anime/trending'
+    | '/kids/anime'
+    | '/kids/cartoons'
+    | '/kids/movies'
+    | '/mature/anime'
+    | '/mature/noir'
+    | '/mature/psychological'
+    | '/mature/trending'
     | '/movies/$movieId'
     | '/admin/broadcast'
     | '/admin/complaints'
@@ -338,9 +478,12 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/anime'
     | '/documentaries'
     | '/forgot-password'
+    | '/kids'
     | '/login'
+    | '/mature'
     | '/reset-password'
     | '/search'
     | '/short-films'
@@ -355,6 +498,17 @@ export interface FileRouteTypes {
     | '/notifications'
     | '/profile'
     | '/watchlist'
+    | '/anime/$animeId'
+    | '/anime/genres'
+    | '/anime/top-rated'
+    | '/anime/trending'
+    | '/kids/anime'
+    | '/kids/cartoons'
+    | '/kids/movies'
+    | '/mature/anime'
+    | '/mature/noir'
+    | '/mature/psychological'
+    | '/mature/trending'
     | '/movies/$movieId'
     | '/admin/broadcast'
     | '/admin/complaints'
@@ -370,9 +524,12 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/anime'
     | '/documentaries'
     | '/forgot-password'
+    | '/kids'
     | '/login'
+    | '/mature'
     | '/reset-password'
     | '/search'
     | '/short-films'
@@ -388,6 +545,17 @@ export interface FileRouteTypes {
     | '/_authenticated/notifications'
     | '/_authenticated/profile'
     | '/_authenticated/watchlist'
+    | '/anime/$animeId'
+    | '/anime/genres'
+    | '/anime/top-rated'
+    | '/anime/trending'
+    | '/kids/anime'
+    | '/kids/cartoons'
+    | '/kids/movies'
+    | '/mature/anime'
+    | '/mature/noir'
+    | '/mature/psychological'
+    | '/mature/trending'
     | '/movies/$movieId'
     | '/_authenticated/admin/broadcast'
     | '/_authenticated/admin/complaints'
@@ -404,9 +572,12 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
+  AnimeRoute: typeof AnimeRouteWithChildren
   DocumentariesRoute: typeof DocumentariesRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
+  KidsRoute: typeof KidsRouteWithChildren
   LoginRoute: typeof LoginRoute
+  MatureRoute: typeof MatureRouteWithChildren
   ResetPasswordRoute: typeof ResetPasswordRoute
   SearchRoute: typeof SearchRoute
   ShortFilmsRoute: typeof ShortFilmsRoute
@@ -476,11 +647,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/mature': {
+      id: '/mature'
+      path: '/mature'
+      fullPath: '/mature'
+      preLoaderRoute: typeof MatureRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/login': {
       id: '/login'
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/kids': {
+      id: '/kids'
+      path: '/kids'
+      fullPath: '/kids'
+      preLoaderRoute: typeof KidsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/forgot-password': {
@@ -495,6 +680,13 @@ declare module '@tanstack/react-router' {
       path: '/documentaries'
       fullPath: '/documentaries'
       preLoaderRoute: typeof DocumentariesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/anime': {
+      id: '/anime'
+      path: '/anime'
+      fullPath: '/anime'
+      preLoaderRoute: typeof AnimeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -517,6 +709,83 @@ declare module '@tanstack/react-router' {
       fullPath: '/movies/$movieId'
       preLoaderRoute: typeof MoviesMovieIdRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/mature/trending': {
+      id: '/mature/trending'
+      path: '/trending'
+      fullPath: '/mature/trending'
+      preLoaderRoute: typeof MatureTrendingRouteImport
+      parentRoute: typeof MatureRoute
+    }
+    '/mature/psychological': {
+      id: '/mature/psychological'
+      path: '/psychological'
+      fullPath: '/mature/psychological'
+      preLoaderRoute: typeof MaturePsychologicalRouteImport
+      parentRoute: typeof MatureRoute
+    }
+    '/mature/noir': {
+      id: '/mature/noir'
+      path: '/noir'
+      fullPath: '/mature/noir'
+      preLoaderRoute: typeof MatureNoirRouteImport
+      parentRoute: typeof MatureRoute
+    }
+    '/mature/anime': {
+      id: '/mature/anime'
+      path: '/anime'
+      fullPath: '/mature/anime'
+      preLoaderRoute: typeof MatureAnimeRouteImport
+      parentRoute: typeof MatureRoute
+    }
+    '/kids/movies': {
+      id: '/kids/movies'
+      path: '/movies'
+      fullPath: '/kids/movies'
+      preLoaderRoute: typeof KidsMoviesRouteImport
+      parentRoute: typeof KidsRoute
+    }
+    '/kids/cartoons': {
+      id: '/kids/cartoons'
+      path: '/cartoons'
+      fullPath: '/kids/cartoons'
+      preLoaderRoute: typeof KidsCartoonsRouteImport
+      parentRoute: typeof KidsRoute
+    }
+    '/kids/anime': {
+      id: '/kids/anime'
+      path: '/anime'
+      fullPath: '/kids/anime'
+      preLoaderRoute: typeof KidsAnimeRouteImport
+      parentRoute: typeof KidsRoute
+    }
+    '/anime/trending': {
+      id: '/anime/trending'
+      path: '/trending'
+      fullPath: '/anime/trending'
+      preLoaderRoute: typeof AnimeTrendingRouteImport
+      parentRoute: typeof AnimeRoute
+    }
+    '/anime/top-rated': {
+      id: '/anime/top-rated'
+      path: '/top-rated'
+      fullPath: '/anime/top-rated'
+      preLoaderRoute: typeof AnimeTopRatedRouteImport
+      parentRoute: typeof AnimeRoute
+    }
+    '/anime/genres': {
+      id: '/anime/genres'
+      path: '/genres'
+      fullPath: '/anime/genres'
+      preLoaderRoute: typeof AnimeGenresRouteImport
+      parentRoute: typeof AnimeRoute
+    }
+    '/anime/$animeId': {
+      id: '/anime/$animeId'
+      path: '/$animeId'
+      fullPath: '/anime/$animeId'
+      preLoaderRoute: typeof AnimeAnimeIdRouteImport
+      parentRoute: typeof AnimeRoute
     }
     '/_authenticated/watchlist': {
       id: '/_authenticated/watchlist'
@@ -693,12 +962,62 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
   AuthenticatedRouteChildren,
 )
 
+interface AnimeRouteChildren {
+  AnimeAnimeIdRoute: typeof AnimeAnimeIdRoute
+  AnimeGenresRoute: typeof AnimeGenresRoute
+  AnimeTopRatedRoute: typeof AnimeTopRatedRoute
+  AnimeTrendingRoute: typeof AnimeTrendingRoute
+}
+
+const AnimeRouteChildren: AnimeRouteChildren = {
+  AnimeAnimeIdRoute: AnimeAnimeIdRoute,
+  AnimeGenresRoute: AnimeGenresRoute,
+  AnimeTopRatedRoute: AnimeTopRatedRoute,
+  AnimeTrendingRoute: AnimeTrendingRoute,
+}
+
+const AnimeRouteWithChildren = AnimeRoute._addFileChildren(AnimeRouteChildren)
+
+interface KidsRouteChildren {
+  KidsAnimeRoute: typeof KidsAnimeRoute
+  KidsCartoonsRoute: typeof KidsCartoonsRoute
+  KidsMoviesRoute: typeof KidsMoviesRoute
+}
+
+const KidsRouteChildren: KidsRouteChildren = {
+  KidsAnimeRoute: KidsAnimeRoute,
+  KidsCartoonsRoute: KidsCartoonsRoute,
+  KidsMoviesRoute: KidsMoviesRoute,
+}
+
+const KidsRouteWithChildren = KidsRoute._addFileChildren(KidsRouteChildren)
+
+interface MatureRouteChildren {
+  MatureAnimeRoute: typeof MatureAnimeRoute
+  MatureNoirRoute: typeof MatureNoirRoute
+  MaturePsychologicalRoute: typeof MaturePsychologicalRoute
+  MatureTrendingRoute: typeof MatureTrendingRoute
+}
+
+const MatureRouteChildren: MatureRouteChildren = {
+  MatureAnimeRoute: MatureAnimeRoute,
+  MatureNoirRoute: MatureNoirRoute,
+  MaturePsychologicalRoute: MaturePsychologicalRoute,
+  MatureTrendingRoute: MatureTrendingRoute,
+}
+
+const MatureRouteWithChildren =
+  MatureRoute._addFileChildren(MatureRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
+  AnimeRoute: AnimeRouteWithChildren,
   DocumentariesRoute: DocumentariesRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
+  KidsRoute: KidsRouteWithChildren,
   LoginRoute: LoginRoute,
+  MatureRoute: MatureRouteWithChildren,
   ResetPasswordRoute: ResetPasswordRoute,
   SearchRoute: SearchRoute,
   ShortFilmsRoute: ShortFilmsRoute,

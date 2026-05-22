@@ -46,16 +46,17 @@ export const CONTENT_TYPES: { id: ContentType; label: string }[] = [
 ];
 
 export function mapDbToMovie(row: any, averageRating?: number): Movie {
-  const isPosterUrl = row.poster && (row.poster.startsWith('http') || row.poster.startsWith('/') || row.poster.startsWith('linear'));
-  const posterStyle = row.poster
-    ? (isPosterUrl && !row.poster.startsWith('linear') ? `url('${row.poster}')` : row.poster)
-    : (row.trailer_id ? `url('https://i.ytimg.com/vi/${row.trailer_id}/hqdefault.jpg')` : `linear-gradient(135deg, #1f1f1f 0%, #111 100%)`);
+ const posterStyle =
+  row.poster ||
+  (row.trailer_id
+    ? `https://i.ytimg.com/vi/${row.trailer_id}/hqdefault.jpg`
+    : 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=1200&auto=format&fit=crop');
 
-  const isBannerUrl = row.banner && (row.banner.startsWith('http') || row.banner.startsWith('/') || row.banner.startsWith('linear'));
-  const bannerStyle = row.banner
-    ? (isBannerUrl && !row.banner.startsWith('linear') ? `url('${row.banner}')` : row.banner)
-    : (row.trailer_id ? `url('https://i.ytimg.com/vi/${row.trailer_id}/maxresdefault.jpg')` : `linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%)`);
-
+const bannerStyle =
+  row.banner ||
+  (row.trailer_id
+    ? `https://i.ytimg.com/vi/${row.trailer_id}/maxresdefault.jpg`
+    : 'https://images.unsplash.com/photo-1440404653325-ab127d49abc1?q=80&w=1600&auto=format&fit=crop');
   let synopsis = row.synopsis || '';
   let extraMeta: any = {};
   if (typeof synopsis === 'string' && synopsis.trim().startsWith('{')) {
@@ -154,8 +155,8 @@ const TITLES: RawTitle[] = [
   { title: 'Whiplash', year: 2014, runtime: 106, genres: ['Drama','Music'], moods: ['thriller-rush','emotional'], atmosphere: 'drama', director: 'Damien Chazelle', cast: ['Miles Teller','J.K. Simmons','Melissa Benoist'], tagline: 'The road to greatness can take you to the edge.', trailerId: '7d_jQycdQGo', rating: 8.5 },
 ];
 
-const ytPoster  = (id: string) => `url('https://i.ytimg.com/vi/${id}/hqdefault.jpg')`;
-const ytBanner  = (id: string) => `url('https://i.ytimg.com/vi/${id}/maxresdefault.jpg')`;
+const ytPoster  = (id: string) => `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
+const ytBanner  = (id: string) => `https://i.ytimg.com/vi/${id}/maxresdefault.jpg`;
 
 // Wikipedia posters blocked hotlinking, so we removed them to fallback to YouTube thumbnails automatically.
 const POSTER_OVERRIDES: Record<string, string> = {};
@@ -176,9 +177,9 @@ export const MOVIES: Movie[] = TITLES.map((t, i) => ({
   rating: t.rating ?? +(7 + (i % 30) / 10).toFixed(1),
   synopsis: `${t.tagline} A ${t.year} ${t.genres.join(' / ').toLowerCase()} feature directed by ${t.director}, starring ${t.cast.slice(0, 2).join(' and ')}. Presented in the RetroScope projection room as a recruiter-grade demo \u2014 the trailer plays, the feature stays sealed.`,
   poster: POSTER_OVERRIDES[t.title]
-    ? `url('${POSTER_OVERRIDES[t.title]}')`
-    : (t.trailerId ? ytPoster(t.trailerId) : mkPoster(t.atmosphere, i + 1)),
-  banner: t.trailerId ? ytBanner(t.trailerId) : mkPoster(t.atmosphere, i + 7),
+    ? POSTER_OVERRIDES[t.title]
+    : (t.trailerId ? ytPoster(t.trailerId) : "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=1200&auto=format&fit=crop"),
+  banner: t.trailerId ? ytBanner(t.trailerId) : "https://images.unsplash.com/photo-1440404653325-ab127d49abc1?q=80&w=1600&auto=format&fit=crop",
   reactions: [
     { time: 18, emoji: '😮', label: 'Plot twist' },
     { time: 42, emoji: '😭', label: 'Emotional spike' },

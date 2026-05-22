@@ -203,7 +203,7 @@ function MaturePageContent() {
       {featured ? (
         <section 
           className="relative h-[70vh] min-h-[500px] w-full overflow-hidden vignette border-b border-red-900/20 shadow-[0_10px_35px_rgba(220,38,38,0.08)]"
-          style={{ backgroundImage: featured.banner }}
+          style={{ backgroundImage: `url(${featured.banner})` }}
         >
           <ProjectorBeam />
           

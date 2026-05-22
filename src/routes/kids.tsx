@@ -44,7 +44,7 @@ function KidsPage() {
       {featured ? (
         <section 
           className="relative h-[65vh] min-h-[480px] w-full overflow-hidden vignette border-b-4 border-[#38BDF8]/20 shadow-[0_8px_30px_rgba(56,189,248,0.15)]"
-          style={{ backgroundImage: featured.banner }}
+          style={{ backgroundImage: `url(${featured.banner})` }}
         >
           <ProjectorBeam />
           

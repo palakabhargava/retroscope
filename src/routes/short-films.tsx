@@ -57,7 +57,7 @@ function ShortFilmsPage() {
 
       {/* Featured Spotlight Section */}
       {featured ? (
-        <section className="relative h-[65vh] min-h-[480px] w-full overflow-hidden vignette" style={{ backgroundImage: featured.banner }}>
+        <section className="relative h-[65vh] min-h-[480px] w-full overflow-hidden vignette" style={{ backgroundImage:`url(${featured.banner})` }}>
           <ProjectorBeam />
           <DustParticles count={35} />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />

@@ -7,15 +7,19 @@ import { CinematicImage } from '@/components/ui/CinematicImage';
 
 export const PosterCard = React.memo(function PosterCard({ movie, size = 'md' }: { movie: Movie; size?: 'sm' | 'md' | 'lg' }) {
   const sizes = {
-    sm: 'w-32 h-48',
-    md: 'w-44 h-64',
-    lg: 'w-56 h-80',
+  sm: 'w-24 h-36 sm:w-28 sm:h-40',
+  md: 'w-28 h-40 sm:w-36 sm:h-52 md:w-44 md:h-64',
+  lg: 'w-36 h-52 sm:w-44 sm:h-64 md:w-56 md:h-80',
   };
 
   return (
     <Link to="/movies/$movieId" params={{ movieId: movie.id }} className="group block">
       <motion.div
-        whileHover={{ y: -6, scale: 1.02 }}
+        whileHover={{
+  y: -8,
+  scale: 1.03,
+  rotateX: 2,
+}}
         transition={{ duration: 0.4, ease: 'easeOut' }}
         className={`${sizes[size]} relative overflow-hidden rounded-md border border-border bg-card shadow-lg ${ambientForAtmosphere(movie.atmosphere)}`}
       >
@@ -25,7 +29,7 @@ export const PosterCard = React.memo(function PosterCard({ movie, size = 'md' }:
           fallbackTitle={movie.title}
           atmosphere={movie.atmosphere}
           aspectRatio="poster"
-          className="absolute inset-0 h-full w-full"
+          className="absolute inset-0 h-full w-full transition-transform duration-700 ease-out group-hover:scale-105"
         />
 
         {/* Card Details */}

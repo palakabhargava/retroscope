@@ -62,7 +62,7 @@ function Home() {
 
       {/* Hero */}
       {featured ? (
-        <section className="relative h-[78vh] min-h-[520px] w-full overflow-hidden vignette" style={{ backgroundImage: featured.banner }}>
+        <section className="relative h-[78vh] min-h-[520px] w-full overflow-hidden vignette" style={{ backgroundImage: `url(${featured.banner })`}}>
           <ProjectorBeam />
           <DustParticles count={50} />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />

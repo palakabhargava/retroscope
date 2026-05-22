@@ -80,7 +80,7 @@ export const CinematicImage: React.FC<CinematicImageProps> = ({
 
   return (
     <div 
-      className={`relative w-full h-full overflow-hidden bg-zinc-950 select-none group/img ${className}`}
+      className={`relative w-full h-full min-h-[180px] overflow-hidden bg-zinc-950 select-none group/img ${className}`}
       style={{
         boxShadow: status === 'failed' ? `inset 0 0 20px rgba(0,0,0,0.8), 0 0 10px ${palette.border}` : undefined,
       }}
@@ -125,23 +125,46 @@ export const CinematicImage: React.FC<CinematicImageProps> = ({
           style={{ backgroundImage: `url(${cleanSrc})` }}
         />
       )}
-
+      
       {/* ACTUAL IMAGE */}
       {cleanSrc && status !== 'failed' && (
         <img
-          src={cleanSrc}
-          alt={alt}
-          loading="lazy"
-          onLoad={() => {
-            setStatus('loaded');
-            setBlurLoaded(true);
-          }}
-          onError={triggerRetry}
-          className={`absolute inset-0 h-full w-full object-cover transition-all duration-700 ease-out ${
-            status === 'loaded' ? 'opacity-100 scale-100' : 'opacity-0 scale-105'
-          }`}
-          {...props}
-        />
+  src={cleanSrc || "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=1200&auto=format&fit=crop"}
+  alt={alt}
+  loading="lazy"
+  decoding="async"
+style={{
+  willChange: 'transform',
+  transform: 'translateZ(0)',
+}}
+  onLoad={() => {
+    setStatus('loaded');
+    setBlurLoaded(true);
+  }}
+  onError={(e) => {
+  const target = e.currentTarget;
+
+  if (!target.dataset.fallbackApplied) {
+    target.dataset.fallbackApplied = 'true';
+
+    target.src =
+      atmosphere === 'anime'
+        ? 'https://images.unsplash.com/photo-1578632767115-351597cf2477?q=80&w=1200&auto=format&fit=crop'
+        : 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=1200&auto=format&fit=crop';
+  } else {
+    setStatus('failed');
+  }
+
+  setBlurLoaded(true);
+  
+}}
+  className={`absolute inset-0 h-full w-full object-cover transition-all duration-1000 ease-out group-hover/img:scale-110 group-hover/img:rotate-[0.5deg] ${
+    status === 'loaded'
+      ? 'opacity-100 scale-100'
+      : 'opacity-0 scale-105'
+  }`}
+  {...props}
+/>
       )}
 
       {/* PREMIUM HIGH-FIDELITY CINEMATIC FALLBACK ARTWORK */}
@@ -190,7 +213,7 @@ export const CinematicImage: React.FC<CinematicImageProps> = ({
       )}
 
       {/* Subtle overlay gradient to darken card base */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent pointer-events-none z-10" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent pointer-events-none z-10 opacity-90 transition-opacity duration-700 group-hover/img:opacity-100" />
     </div>
   );
 };

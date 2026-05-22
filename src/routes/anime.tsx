@@ -44,7 +44,7 @@ function AnimePage() {
       {featured ? (
         <section 
           className="relative h-[70vh] min-h-[500px] w-full overflow-hidden vignette border-b border-primary/20 shadow-[0_10px_30px_rgba(255,77,141,0.1)]"
-          style={{ backgroundImage: featured.banner }}
+          style={{ backgroundImage: `url(${featured.banner })`}}
         >
           <ProjectorBeam />
           

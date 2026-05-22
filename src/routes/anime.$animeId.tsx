@@ -146,7 +146,7 @@ function AnimeDetail() {
       {/* Hero Banner Section */}
       <section 
         className="relative h-[65vh] min-h-[480px] w-full overflow-hidden vignette border-b border-primary/20 shadow-[0_10px_30px_rgba(255,77,141,0.08)]" 
-        style={{ backgroundImage: movie.banner }}
+        style={{ backgroundImage: `url(${movie.banner })`}}
       >
         <ProjectorBeam />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/45 to-transparent" />

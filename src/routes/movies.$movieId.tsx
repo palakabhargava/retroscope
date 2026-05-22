@@ -154,7 +154,7 @@ function MovieDetail() {
         <div className="relative mx-auto flex h-full max-w-7xl items-end gap-8 px-6 pb-12">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1 }}
             className={`hidden md:block h-72 w-48 shrink-0 overflow-hidden rounded-md border border-border bg-cover bg-center ${ambientForAtmosphere(movie.atmosphere)}`}
-            style={{ backgroundImage: movie.poster }} />
+            style={{ backgroundImage: `url(${movie.poster})` }} />
           <div className="max-w-2xl">
             <p className="font-retro text-xs uppercase tracking-[0.3em] text-primary">— {movie.type.replace('_', ' ')} · {movie.atmosphere} · {movie.year} —</p>
             <h1 className="mt-2 font-display text-5xl font-black text-glow">{movie.title}</h1>

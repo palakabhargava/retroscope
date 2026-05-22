@@ -1874,6 +1874,7 @@ const CURATED_DEMO_CONTENT: RawDemoContent[] = [
     tagline: 'The golden voice of the reel.',
     poster: null,
     banner: null,
+    trailer_id: 'v0j9i8u7t6s',
     is_premium: true
   }
 ];
