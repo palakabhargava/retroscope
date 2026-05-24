@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Film, RefreshCw, ImageOff } from 'lucide-react';
+import { Film, RefreshCw } from 'lucide-react';
+import { getImageFallback, GRADIENT_PALETTES, setCachedImageStatus } from '@/lib/imageOptimization';
 
 interface CinematicImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
   src: string;
@@ -9,36 +10,58 @@ interface CinematicImageProps extends React.ImgHTMLAttributes<HTMLImageElement> 
   atmosphere?: string;
   aspectRatio?: 'poster' | 'banner' | 'square';
   className?: string;
+  imageType?: 'anime' | 'movie' | 'banner' | 'thumbnail' | 'classic' | 'kids' | 'mature';
 }
 
-const PALETTES: Record<string, { from: string; via: string; to: string; border: string }> = {
-  anime: { from: '#0F1026', via: '#1E1035', to: '#0B0D19', border: 'rgba(255, 77, 141, 0.4)' },
-  kids: { from: '#0F172A', via: '#1E293B', to: '#030712', border: 'rgba(56, 189, 248, 0.4)' },
-  mature: { from: '#050505', via: '#1F0505', to: '#000000', border: 'rgba(153, 27, 27, 0.5)' },
-  classic: { from: '#1A1A1A', via: '#2A2A2A', to: '#111111', border: 'rgba(255, 140, 66, 0.3)' },
-  salaar: { from: '#060B08', via: '#111613', to: '#020202', border: 'rgba(138, 21, 21, 0.5)' },
-  interstellar: { from: '#02020A', via: '#0D0E1C', to: '#010103', border: 'rgba(96, 165, 250, 0.5)' },
-  cyberpunk: { from: '#0D0214', via: '#1A0B2E', to: '#020005', border: 'rgba(255, 0, 127, 0.5)' },
-  romance: { from: '#1F0C14', via: '#3D1525', to: '#0D0207', border: 'rgba(244, 114, 182, 0.5)' },
-  horror: { from: '#050000', via: '#140505', to: '#000000', border: 'rgba(153, 27, 27, 0.6)' },
-};
+// YouTube video ID to thumbnail fallback
+function getYoutubeThumbnail(videoId: string, size: 'default' | 'medium' | 'high' = 'high'): string {
+  const qualityMap = {
+    default: 'default',
+    medium: 'mqdefault',
+    high: 'hqdefault',
+  };
+  return `https://i.ytimg.com/vi/${videoId}/${qualityMap[size]}.jpg`;
+}
 
-export const CinematicImage: React.FC<CinematicImageProps> = ({
+export const CinematicImage: React.FC<CinematicImageProps> = React.memo(function CinematicImage({
   src,
   alt,
   fallbackTitle,
   atmosphere = 'classic',
   aspectRatio = 'poster',
   className = '',
+  imageType = 'movie',
   ...props
-}) => {
+}) {
   const [status, setStatus] = useState<'idle' | 'loading' | 'loaded' | 'retrying' | 'failed'>('idle');
   const [retryCount, setRetryCount] = useState(0);
   const [blurLoaded, setBlurLoaded] = useState(false);
+  const [fallbackChain, setFallbackChain] = useState<string[]>([]);
+  const [currentFallbackIndex, setCurrentFallbackIndex] = useState(0);
   const retryTimerRef = useRef<number | null>(null);
+  const imgRef = useRef<HTMLImageElement>(null);
 
-  const cleanSrc = src ? src.replace(/^url\(['"]?|['"]?\)$/g, '') : '';
-  const isGradient = !cleanSrc || cleanSrc.includes('gradient');
+  const cleanSrc = useMemo(() => {
+    return src ? src.replace(/^url\(['"]?|['"]?\)$/g, '') : '';
+  }, [src]);
+
+  const isGradient = useMemo(() => {
+    return !cleanSrc || cleanSrc.includes('gradient');
+  }, [cleanSrc]);
+
+  const palette = useMemo(() => {
+    return GRADIENT_PALETTES[atmosphere.toLowerCase()] || GRADIENT_PALETTES.classic;
+  }, [atmosphere]);
+
+  // Generate fallback chain on mount
+  useEffect(() => {
+    const chain = [
+      cleanSrc,
+      getImageFallback(imageType, 0),
+      getImageFallback(imageType, 1),
+    ].filter(Boolean);
+    setFallbackChain(chain);
+  }, [cleanSrc, imageType]);
 
   useEffect(() => {
     if (isGradient) {
@@ -46,10 +69,11 @@ export const CinematicImage: React.FC<CinematicImageProps> = ({
       return;
     }
     
-    if (cleanSrc) {
+    if (cleanSrc && fallbackChain.length > 0) {
       setStatus('loading');
       setRetryCount(0);
       setBlurLoaded(false);
+      setCurrentFallbackIndex(0);
     } else {
       setStatus('failed');
     }
@@ -59,24 +83,24 @@ export const CinematicImage: React.FC<CinematicImageProps> = ({
         window.clearTimeout(retryTimerRef.current);
       }
     };
-  }, [cleanSrc, isGradient]);
+  }, [cleanSrc, isGradient, fallbackChain]);
 
-  const triggerRetry = () => {
-    if (retryCount < 2) {
+  const triggerRetry = useCallback(() => {
+    if (retryCount < fallbackChain.length - 1) {
       setStatus('retrying');
       setRetryCount((prev) => prev + 1);
+      setCurrentFallbackIndex((prev) => prev + 1);
       
-      const delay = (retryCount + 1) * 1200; // Exponential backup
+      const delay = (retryCount + 1) * 1000; // Exponential backoff
       retryTimerRef.current = window.setTimeout(() => {
-        // Trigger reload by modifying image src query param or re-triggering element
         setStatus('loading');
       }, delay);
     } else {
       setStatus('failed');
     }
-  };
+  }, [retryCount, fallbackChain.length]);
 
-  const palette = PALETTES[atmosphere] || PALETTES.classic;
+  const currentSrc = fallbackChain[currentFallbackIndex] || cleanSrc;
 
   return (
     <div 
@@ -108,7 +132,7 @@ export const CinematicImage: React.FC<CinematicImageProps> = ({
               </div>
               {status === 'retrying' && (
                 <span className="font-retro text-[8px] tracking-widest text-primary uppercase animate-pulse">
-                  RECONNECTING ({retryCount}/2)...
+                  REEL {currentFallbackIndex + 1}/{fallbackChain.length}...
                 </span>
               )}
             </div>
@@ -117,54 +141,51 @@ export const CinematicImage: React.FC<CinematicImageProps> = ({
       </AnimatePresence>
 
       {/* BLUR-UP LOW-RES PLACEHOLDER */}
-      {cleanSrc && status !== 'failed' && (
+      {currentSrc && status !== 'failed' && (
         <div 
-          className={`absolute inset-0 z-10 transition-opacity duration-700 bg-cover bg-center filter blur-md ${
+          className={`absolute inset-0 z-10 transition-opacity duration-700 bg-cover bg-center filter blur-lg ${
             blurLoaded ? 'opacity-0' : 'opacity-100'
           }`}
-          style={{ backgroundImage: `url(${cleanSrc})` }}
+          style={{ 
+            backgroundImage: `url(${currentSrc})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+          }}
         />
       )}
       
       {/* ACTUAL IMAGE */}
-      {cleanSrc && status !== 'failed' && (
+      {currentSrc && status !== 'failed' && (
         <img
-  src={cleanSrc || "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=1200&auto=format&fit=crop"}
-  alt={alt}
-  loading="lazy"
-  decoding="async"
-style={{
-  willChange: 'transform',
-  transform: 'translateZ(0)',
-}}
-  onLoad={() => {
-    setStatus('loaded');
-    setBlurLoaded(true);
-  }}
-  onError={(e) => {
-  const target = e.currentTarget;
-
-  if (!target.dataset.fallbackApplied) {
-    target.dataset.fallbackApplied = 'true';
-
-    target.src =
-      atmosphere === 'anime'
-        ? 'https://images.unsplash.com/photo-1578632767115-351597cf2477?q=80&w=1200&auto=format&fit=crop'
-        : 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=1200&auto=format&fit=crop';
-  } else {
-    setStatus('failed');
-  }
-
-  setBlurLoaded(true);
-  
-}}
-  className={`absolute inset-0 h-full w-full object-cover transition-all duration-1000 ease-out group-hover/img:scale-110 group-hover/img:rotate-[0.5deg] ${
-    status === 'loaded'
-      ? 'opacity-100 scale-100'
-      : 'opacity-0 scale-105'
-  }`}
-  {...props}
-/>
+          ref={imgRef}
+          src={currentSrc}
+          alt={alt}
+          loading="lazy"
+          decoding="async"
+          style={{
+            willChange: 'transform',
+            transform: 'translateZ(0)',
+            contain: 'layout style paint',
+          }}
+          onLoad={() => {
+            setStatus('loaded');
+            setBlurLoaded(true);
+            setCachedImageStatus(currentSrc, true);
+          }}
+          onError={() => {
+            if (currentFallbackIndex < fallbackChain.length - 1) {
+              triggerRetry();
+            } else {
+              setStatus('failed');
+            }
+          }}
+          className={`absolute inset-0 h-full w-full object-cover transition-all duration-1000 ease-out group-hover/img:scale-110 group-hover/img:rotate-[0.5deg] ${
+            status === 'loaded'
+              ? 'opacity-100 scale-100'
+              : 'opacity-0 scale-105'
+          }`}
+          {...props}
+        />
       )}
 
       {/* PREMIUM HIGH-FIDELITY CINEMATIC FALLBACK ARTWORK */}
@@ -172,27 +193,28 @@ style={{
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="absolute inset-0 flex flex-col items-center justify-center p-4 text-center bg-gradient-to-b"
+          transition={{ duration: 0.5 }}
+          className="absolute inset-0 flex flex-col items-center justify-center p-4 text-center"
           style={{
-            backgroundImage: `radial-gradient(circle at top, ${palette.via} 0%, ${palette.from} 60%, ${palette.to} 100%)`
+            backgroundImage: palette.gradient,
           }}
         >
           {/* Neon atmospheric glow layer */}
           <div className="absolute inset-0 bg-black/40 mix-blend-overlay" />
           <div 
             className="absolute top-1/4 h-24 w-24 rounded-full filter blur-xl opacity-30 animate-pulse" 
-            style={{ backgroundColor: palette.border }}
+            style={{ backgroundColor: palette.border, boxShadow: `0 0 30px ${palette.border}` }}
           />
 
           <div className="relative z-10 flex flex-col items-center max-w-full px-2">
-            <div className="p-3 rounded-full bg-black/60 border border-white/5 shadow-xl mb-3 group-hover/img:scale-110 transition-transform duration-500">
+            <div className="p-3 rounded-full bg-black/60 border border-white/10 shadow-xl mb-3 group-hover/img:scale-110 transition-transform duration-500">
               <Film 
                 className="h-7 w-7 text-primary/80 filter drop-shadow-[0_0_8px_var(--primary)] animate-pulse" 
                 style={{ color: palette.border }}
               />
             </div>
             
-            <span className="font-retro text-[8px] uppercase tracking-widest text-white/50 mb-1">
+            <span className="font-retro text-[8px] uppercase tracking-widest text-white/60 mb-1">
               {atmosphere.toUpperCase()} MULTIVERSE
             </span>
 
@@ -201,8 +223,8 @@ style={{
             </h4>
 
             {aspectRatio === 'poster' && (
-              <p className="mt-2 text-[9px] font-retro text-primary/80 uppercase tracking-widest bg-black/40 px-2 py-0.5 rounded border border-white/5">
-                projection reel
+              <p className="mt-2 text-[9px] font-retro text-white/70 uppercase tracking-widest bg-black/40 px-2 py-0.5 rounded border border-white/10">
+                PROJECTION REEL
               </p>
             )}
           </div>
@@ -216,4 +238,4 @@ style={{
       <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent pointer-events-none z-10 opacity-90 transition-opacity duration-700 group-hover/img:opacity-100" />
     </div>
   );
-};
+});

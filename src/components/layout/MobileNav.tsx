@@ -1,39 +1,56 @@
 import { Link, useRouterState } from '@tanstack/react-router';
-import { Home, Search, Film, Ticket, User } from 'lucide-react';
+import { Home, Search, Film, Calendar, Clapperboard, User } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useOrientation } from '@/hooks/useMobileOptimization';
 
 export function MobileNav() {
   const path = useRouterState({ select: s => s.location.pathname });
+  const orientation = useOrientation();
+  
   const items = [
     { to: '/', icon: Home, label: 'Home' },
     { to: '/search', icon: Search, label: 'Browse' },
+    { to: '/classics', icon: Clapperboard, label: 'Classics' },
+    { to: '/anime', icon: Calendar, label: 'Anime' },
     { to: '/watchlist', icon: Film, label: 'Shelf' },
-    { to: '/history', icon: Ticket, label: 'Tickets' },
     { to: '/profile', icon: User, label: 'Me' },
   ] as const;
   
+  // Hide nav in landscape mode on mobile
+  if (orientation === 'landscape') {
+    return null;
+  }
+  
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-40 md:hidden glass border-t border-white/10 rounded-t-lg shadow-2xl pb-safe">
-      <div className="flex justify-around py-2.5">
+    <nav className="fixed inset-x-0 bottom-0 z-40 md:hidden border-t border-border/50 rounded-t-xl shadow-2xl bg-background/80 backdrop-blur-xl safe-bottom pb-safe">
+      <div className="flex justify-around h-20 sm:h-20">
         {items.map(({ to, icon: Icon, label }) => {
-          const active = path === to;
+          const active = path === to || (to !== '/' && path.startsWith(to));
           return (
             <motion.div 
               key={to}
-              whileTap={{ scale: 0.90 }}
-              transition={{ type: 'spring', stiffness: 400, damping: 15 }}
+              className="flex-1 flex items-center justify-center"
+              whileTap={{ scale: 0.95 }}
+              transition={{ type: 'spring', stiffness: 500, damping: 20 }}
             >
               <Link 
                 to={to}
-                className={`flex flex-col items-center gap-1.5 px-3 py-1 font-retro text-[9px] uppercase tracking-wider relative transition duration-150
-                  ${active ? 'text-primary text-glow font-bold' : 'text-muted-foreground hover:text-foreground'}`}
+                className={`flex flex-col items-center justify-center gap-1 px-3 py-2 sm:px-4 w-full h-full font-retro text-[9px] sm:text-[10px] uppercase tracking-wider relative transition duration-150 touch-target
+                  ${active 
+                    ? 'text-primary text-glow font-bold' 
+                    : 'text-muted-foreground hover:text-foreground active:text-primary'
+                  }`}
+                aria-current={active ? 'page' : undefined}
               >
-                <Icon size={19} className={active ? 'stroke-[2.5px]' : 'stroke-[1.5px]'} />
-                <span>{label}</span>
+                <Icon size={20} className={`${active ? 'stroke-[2px]' : 'stroke-[1.5px]'}`} />
+                <span className="line-clamp-1">{label}</span>
                 {active && (
                   <motion.div 
                     layoutId="activeMobileIndicator" 
-                    className="absolute -top-2.5 inset-x-4 h-0.5 bg-primary" 
+                    className="absolute -bottom-0.5 inset-x-2 h-0.5 bg-gradient-to-r from-primary via-primary to-transparent rounded-full" 
+                    initial={{ opacity: 0, scaleX: 0 }}
+                    animate={{ opacity: 1, scaleX: 1 }}
+                    transition={{ duration: 0.3 }}
                   />
                 )}
               </Link>
