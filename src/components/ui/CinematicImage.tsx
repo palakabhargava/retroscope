@@ -23,6 +23,15 @@ function getYoutubeThumbnail(videoId: string, size: 'default' | 'medium' | 'high
   return `https://i.ytimg.com/vi/${videoId}/${qualityMap[size]}.jpg`;
 }
 
+function extractYoutubeIdFromThumbUrl(url: string): string | null {
+  // Matches:
+  // - https://i.ytimg.com/vi/<id>/maxresdefault.jpg
+  // - https://i.ytimg.com/vi/<id>/hqdefault.jpg
+  // - https://img.youtube.com/vi/<id>/...
+  const m = url.match(/(?:i\.ytimg\.com|img\.youtube\.com)\/vi\/([^/]+)\//i);
+  return m?.[1] ?? null;
+}
+
 export const CinematicImage: React.FC<CinematicImageProps> = React.memo(function CinematicImage({
   src,
   alt,
@@ -55,12 +64,23 @@ export const CinematicImage: React.FC<CinematicImageProps> = React.memo(function
 
   // Generate fallback chain on mount
   useEffect(() => {
-    const chain = [
-      cleanSrc,
-      getImageFallback(imageType, 0),
-      getImageFallback(imageType, 1),
-    ].filter(Boolean);
-    setFallbackChain(chain);
+    const chain: string[] = [];
+    if (cleanSrc) chain.push(cleanSrc);
+
+    // YouTube maxres often 404s; add a quality ladder before generic fallbacks.
+    const ytId = cleanSrc ? extractYoutubeIdFromThumbUrl(cleanSrc) : null;
+    if (ytId) {
+      chain.push(getYoutubeThumbnail(ytId, 'high'));
+      chain.push(getYoutubeThumbnail(ytId, 'medium'));
+      chain.push(getYoutubeThumbnail(ytId, 'default'));
+    }
+
+    chain.push(getImageFallback(imageType, 0));
+    chain.push(getImageFallback(imageType, 1));
+
+    const uniq = Array.from(new Set(chain.filter(Boolean)));
+    const limited = uniq.slice(0, 6);
+    setFallbackChain(limited);
   }, [cleanSrc, imageType]);
 
   useEffect(() => {

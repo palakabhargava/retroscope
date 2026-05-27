@@ -7,6 +7,7 @@ import { DustParticles } from '@/components/cinematic/DustParticles';
 import { Link } from '@tanstack/react-router';
 import { Play, Sparkles, TrendingUp, Award, Layers } from 'lucide-react';
 import { SEOHelper } from '@/components/layout/SEOHelper';
+import { CinematicHeroBackdrop } from '@/components/cinematic/CinematicHeroBackdrop';
 
 export const Route = createFileRoute('/anime')({
   component: AnimePage,
@@ -43,9 +44,9 @@ function AnimePage() {
       {/* Holographic Glowing Header Banner */}
       {featured ? (
         <section 
-          className="relative h-[70vh] min-h-[500px] w-full overflow-hidden vignette border-b border-primary/20 shadow-[0_10px_30px_rgba(255,77,141,0.1)]"
-          style={{ backgroundImage: `url(${featured.banner })`}}
+          className="relative h-[62vh] sm:h-[70vh] min-h-[420px] sm:min-h-[500px] w-full overflow-hidden vignette border-b border-primary/20 shadow-[0_10px_30px_rgba(255,77,141,0.1)]"
         >
+          <CinematicHeroBackdrop item={featured} />
           <ProjectorBeam />
           
           {/* Energy aura glow overlay */}
@@ -58,7 +59,7 @@ function AnimePage() {
               <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/20 border border-primary/40 px-3 py-1 font-retro text-[9px] uppercase tracking-widest text-[#FF4D8D] mb-3 animate-pulse">
                 <Sparkles size={10} className="text-[#FF66C4]" /> HOLOGRAPHIC SPOTLIGHT
               </span>
-              <h1 className="font-display text-4xl sm:text-6xl font-black leading-[0.95] text-foreground text-glow text-glow-pink">
+              <h1 className="font-display text-3xl sm:text-6xl font-black leading-[0.95] text-foreground text-glow text-glow-pink">
                 {featured.title}
               </h1>
               <p className="mt-4 text-xs uppercase font-retro tracking-widest text-[#22D3EE]">
@@ -92,7 +93,7 @@ function AnimePage() {
       )}
 
       {/* Sub navigation bar */}
-      <div className="bg-[#111827]/80 border-y border-primary/10 backdrop-blur sticky top-[57px] z-30">
+      <div className="bg-[#111827]/80 border-y border-primary/10 backdrop-blur sticky top-[57px] md:top-0 z-30">
         <div className="mx-auto max-w-7xl px-6 py-4 flex flex-wrap justify-between items-center gap-4">
           <div className="flex items-center gap-2">
             <div className="h-2 w-2 rounded-full bg-[#FF4D8D] animate-ping" />

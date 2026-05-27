@@ -24,6 +24,7 @@ export const Route = createFileRoute('/movies/$movieId')({
 
 import { MovieDetailSkeleton } from '@/components/layout/PageSkeletons';
 import { SEOHelper } from '@/components/layout/SEOHelper';
+import { CinematicHeroBackdrop } from '@/components/cinematic/CinematicHeroBackdrop';
 
 function MovieDetail() {
   const { movieId } = Route.useParams();
@@ -148,7 +149,8 @@ function MovieDetail() {
         canonicalPath={`/movies/${movie.id}`}
         schema={movieSchema}
       />
-      <section className="relative h-[70vh] min-h-[460px] w-full overflow-hidden bg-cover bg-center vignette" style={{ backgroundImage: movie.banner }}>
+      <section className="relative h-[70vh] min-h-[460px] w-full overflow-hidden bg-cover bg-center vignette">
+        <CinematicHeroBackdrop item={movie} />
         <ProjectorBeam />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/30 to-background/10" />
         <div className="relative mx-auto flex h-full max-w-7xl items-end gap-8 px-6 pb-12">

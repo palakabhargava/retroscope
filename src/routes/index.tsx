@@ -9,6 +9,7 @@ import { DustParticles } from '@/components/cinematic/DustParticles';
 import { Link } from '@tanstack/react-router';
 import { Play } from 'lucide-react';
 import { useContents } from '@/hooks/queries';
+import { CinematicHeroBackdrop } from '@/components/cinematic/CinematicHeroBackdrop';
 
 export const Route = createFileRoute('/')({
   component: Home,
@@ -62,7 +63,8 @@ function Home() {
 
       {/* Hero */}
       {featured ? (
-        <section className="relative h-[78vh] min-h-[520px] w-full overflow-hidden vignette" style={{ backgroundImage: `url(${featured.banner })`}}>
+        <section className="relative h-[72vh] sm:h-[78vh] min-h-[440px] sm:min-h-[520px] w-full overflow-hidden vignette">
+          <CinematicHeroBackdrop item={featured} />
           <ProjectorBeam />
           <DustParticles count={50} />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
@@ -71,7 +73,7 @@ function Home() {
               <motion.p initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1 }}
                 className="font-retro text-xs uppercase tracking-[0.4em] text-primary">— Now Showing at RetroScope —</motion.p>
               <motion.h1 initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1.1, delay: 0.1 }}
-                className="mt-3 font-display text-6xl font-black leading-[0.95] text-foreground text-glow">
+                className="mt-3 font-display text-4xl sm:text-6xl font-black leading-[0.95] text-foreground text-glow">
                 {featured.title}
               </motion.h1>
               <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1.2, delay: 0.3 }}

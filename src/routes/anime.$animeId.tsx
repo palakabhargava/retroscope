@@ -10,6 +10,7 @@ import { useContentItem, useUserRating, useSaveRating, useSaveReview, useDeleteR
 import { toast } from 'sonner';
 import { SEOHelper } from '@/components/layout/SEOHelper';
 import { MovieDetailSkeleton } from '@/components/layout/PageSkeletons';
+import { CinematicHeroBackdrop } from '@/components/cinematic/CinematicHeroBackdrop';
 
 export const Route = createFileRoute('/anime/$animeId')({
   component: AnimeDetail,
@@ -145,9 +146,9 @@ function AnimeDetail() {
 
       {/* Hero Banner Section */}
       <section 
-        className="relative h-[65vh] min-h-[480px] w-full overflow-hidden vignette border-b border-primary/20 shadow-[0_10px_30px_rgba(255,77,141,0.08)]" 
-        style={{ backgroundImage: `url(${movie.banner })`}}
+        className="relative h-[65vh] min-h-[480px] w-full overflow-hidden vignette border-b border-primary/20 shadow-[0_10px_30px_rgba(255,77,141,0.08)]"
       >
+        <CinematicHeroBackdrop item={movie} />
         <ProjectorBeam />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/45 to-transparent" />
         <div className="absolute top-1/4 left-1/3 w-[25rem] h-[25rem] rounded-full bg-[#7C3AED]/15 filter blur-[100px] pointer-events-none" />

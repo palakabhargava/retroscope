@@ -1,4 +1,5 @@
 import type { Movie } from '@/data/movies';
+import { CinematicImage } from '@/components/ui/CinematicImage';
 export function VintageTicket({ movie, watchedOn, mood, rating }: { movie: Movie; watchedOn: string; mood: string; rating: number }) {
   return (
     <div className="relative flex overflow-hidden rounded-md border border-border bg-card">
@@ -8,7 +9,17 @@ export function VintageTicket({ movie, watchedOn, mood, rating }: { movie: Movie
       <div className="absolute -right-2 top-1/2 grid -translate-y-1/2 gap-2">
         {Array.from({length: 6}).map((_, i) => <span key={i} className="block h-2 w-2 rounded-full bg-background"/>)}
       </div>
-      <div className="w-32 shrink-0" style={{ backgroundImage: `url(${movie.poster})`, backgroundSize: 'cover' }} />
+      <div className="w-32 shrink-0 relative">
+        <CinematicImage
+          src={movie.poster}
+          alt={movie.title}
+          fallbackTitle={movie.title}
+          atmosphere={movie.atmosphere}
+          aspectRatio="poster"
+          imageType={movie.type === 'anime' ? 'anime' : movie.type === 'mature' ? 'mature' : 'movie'}
+          className="absolute inset-0"
+        />
+      </div>
       <div className="flex-1 border-l border-dashed border-border p-4">
         <p className="font-retro text-[10px] uppercase tracking-widest text-primary">— RetroScope Admit One —</p>
         <h3 className="font-display text-lg font-bold leading-tight">{movie.title}</h3>

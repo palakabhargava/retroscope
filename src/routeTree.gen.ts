@@ -10,16 +10,20 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WebSeriesRouteImport } from './routes/web-series'
+import { Route as UpcomingRouteImport } from './routes/upcoming'
 import { Route as TrendingRouteImport } from './routes/trending'
 import { Route as TopRatedRouteImport } from './routes/top-rated'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SubscriptionRouteImport } from './routes/subscription'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as ShortFilmsRouteImport } from './routes/short-films'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as MatureRouteImport } from './routes/mature'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as KidsRouteImport } from './routes/kids'
+import { Route as GuidelinesRouteImport } from './routes/guidelines'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as DocumentariesRouteImport } from './routes/documentaries'
 import { Route as AnimeRouteImport } from './routes/anime'
@@ -60,6 +64,11 @@ const WebSeriesRoute = WebSeriesRouteImport.update({
   path: '/web-series',
   getParentRoute: () => rootRouteImport,
 } as any)
+const UpcomingRoute = UpcomingRouteImport.update({
+  id: '/upcoming',
+  path: '/upcoming',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TrendingRoute = TrendingRouteImport.update({
   id: '/trending',
   path: '/trending',
@@ -68,6 +77,11 @@ const TrendingRoute = TrendingRouteImport.update({
 const TopRatedRoute = TopRatedRouteImport.update({
   id: '/top-rated',
   path: '/top-rated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SubscriptionRoute = SubscriptionRouteImport.update({
@@ -95,6 +109,11 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
   path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MatureRoute = MatureRouteImport.update({
   id: '/mature',
   path: '/mature',
@@ -108,6 +127,11 @@ const LoginRoute = LoginRouteImport.update({
 const KidsRoute = KidsRouteImport.update({
   id: '/kids',
   path: '/kids',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GuidelinesRoute = GuidelinesRouteImport.update({
+  id: '/guidelines',
+  path: '/guidelines',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
@@ -294,16 +318,20 @@ export interface FileRoutesByFullPath {
   '/anime': typeof AnimeRouteWithChildren
   '/documentaries': typeof DocumentariesRoute
   '/forgot-password': typeof ForgotPasswordRoute
+  '/guidelines': typeof GuidelinesRoute
   '/kids': typeof KidsRouteWithChildren
   '/login': typeof LoginRoute
   '/mature': typeof MatureRouteWithChildren
+  '/privacy': typeof PrivacyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/search': typeof SearchRoute
   '/short-films': typeof ShortFilmsRoute
   '/signup': typeof SignupRoute
   '/subscription': typeof SubscriptionRoute
+  '/terms': typeof TermsRoute
   '/top-rated': typeof TopRatedRoute
   '/trending': typeof TrendingRoute
+  '/upcoming': typeof UpcomingRoute
   '/web-series': typeof WebSeriesRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/complaints': typeof AuthenticatedComplaintsRoute
@@ -340,16 +368,20 @@ export interface FileRoutesByTo {
   '/anime': typeof AnimeRouteWithChildren
   '/documentaries': typeof DocumentariesRoute
   '/forgot-password': typeof ForgotPasswordRoute
+  '/guidelines': typeof GuidelinesRoute
   '/kids': typeof KidsRouteWithChildren
   '/login': typeof LoginRoute
   '/mature': typeof MatureRouteWithChildren
+  '/privacy': typeof PrivacyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/search': typeof SearchRoute
   '/short-films': typeof ShortFilmsRoute
   '/signup': typeof SignupRoute
   '/subscription': typeof SubscriptionRoute
+  '/terms': typeof TermsRoute
   '/top-rated': typeof TopRatedRoute
   '/trending': typeof TrendingRoute
+  '/upcoming': typeof UpcomingRoute
   '/web-series': typeof WebSeriesRoute
   '/complaints': typeof AuthenticatedComplaintsRoute
   '/dna': typeof AuthenticatedDnaRoute
@@ -387,16 +419,20 @@ export interface FileRoutesById {
   '/anime': typeof AnimeRouteWithChildren
   '/documentaries': typeof DocumentariesRoute
   '/forgot-password': typeof ForgotPasswordRoute
+  '/guidelines': typeof GuidelinesRoute
   '/kids': typeof KidsRouteWithChildren
   '/login': typeof LoginRoute
   '/mature': typeof MatureRouteWithChildren
+  '/privacy': typeof PrivacyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/search': typeof SearchRoute
   '/short-films': typeof ShortFilmsRoute
   '/signup': typeof SignupRoute
   '/subscription': typeof SubscriptionRoute
+  '/terms': typeof TermsRoute
   '/top-rated': typeof TopRatedRoute
   '/trending': typeof TrendingRoute
+  '/upcoming': typeof UpcomingRoute
   '/web-series': typeof WebSeriesRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/complaints': typeof AuthenticatedComplaintsRoute
@@ -435,16 +471,20 @@ export interface FileRouteTypes {
     | '/anime'
     | '/documentaries'
     | '/forgot-password'
+    | '/guidelines'
     | '/kids'
     | '/login'
     | '/mature'
+    | '/privacy'
     | '/reset-password'
     | '/search'
     | '/short-films'
     | '/signup'
     | '/subscription'
+    | '/terms'
     | '/top-rated'
     | '/trending'
+    | '/upcoming'
     | '/web-series'
     | '/admin'
     | '/complaints'
@@ -481,16 +521,20 @@ export interface FileRouteTypes {
     | '/anime'
     | '/documentaries'
     | '/forgot-password'
+    | '/guidelines'
     | '/kids'
     | '/login'
     | '/mature'
+    | '/privacy'
     | '/reset-password'
     | '/search'
     | '/short-films'
     | '/signup'
     | '/subscription'
+    | '/terms'
     | '/top-rated'
     | '/trending'
+    | '/upcoming'
     | '/web-series'
     | '/complaints'
     | '/dna'
@@ -527,16 +571,20 @@ export interface FileRouteTypes {
     | '/anime'
     | '/documentaries'
     | '/forgot-password'
+    | '/guidelines'
     | '/kids'
     | '/login'
     | '/mature'
+    | '/privacy'
     | '/reset-password'
     | '/search'
     | '/short-films'
     | '/signup'
     | '/subscription'
+    | '/terms'
     | '/top-rated'
     | '/trending'
+    | '/upcoming'
     | '/web-series'
     | '/_authenticated/admin'
     | '/_authenticated/complaints'
@@ -575,16 +623,20 @@ export interface RootRouteChildren {
   AnimeRoute: typeof AnimeRouteWithChildren
   DocumentariesRoute: typeof DocumentariesRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
+  GuidelinesRoute: typeof GuidelinesRoute
   KidsRoute: typeof KidsRouteWithChildren
   LoginRoute: typeof LoginRoute
   MatureRoute: typeof MatureRouteWithChildren
+  PrivacyRoute: typeof PrivacyRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SearchRoute: typeof SearchRoute
   ShortFilmsRoute: typeof ShortFilmsRoute
   SignupRoute: typeof SignupRoute
   SubscriptionRoute: typeof SubscriptionRoute
+  TermsRoute: typeof TermsRoute
   TopRatedRoute: typeof TopRatedRoute
   TrendingRoute: typeof TrendingRoute
+  UpcomingRoute: typeof UpcomingRoute
   WebSeriesRoute: typeof WebSeriesRoute
   MoviesMovieIdRoute: typeof MoviesMovieIdRoute
 }
@@ -596,6 +648,13 @@ declare module '@tanstack/react-router' {
       path: '/web-series'
       fullPath: '/web-series'
       preLoaderRoute: typeof WebSeriesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/upcoming': {
+      id: '/upcoming'
+      path: '/upcoming'
+      fullPath: '/upcoming'
+      preLoaderRoute: typeof UpcomingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/trending': {
@@ -610,6 +669,13 @@ declare module '@tanstack/react-router' {
       path: '/top-rated'
       fullPath: '/top-rated'
       preLoaderRoute: typeof TopRatedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/subscription': {
@@ -647,6 +713,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/mature': {
       id: '/mature'
       path: '/mature'
@@ -666,6 +739,13 @@ declare module '@tanstack/react-router' {
       path: '/kids'
       fullPath: '/kids'
       preLoaderRoute: typeof KidsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/guidelines': {
+      id: '/guidelines'
+      path: '/guidelines'
+      fullPath: '/guidelines'
+      preLoaderRoute: typeof GuidelinesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/forgot-password': {
@@ -1015,16 +1095,20 @@ const rootRouteChildren: RootRouteChildren = {
   AnimeRoute: AnimeRouteWithChildren,
   DocumentariesRoute: DocumentariesRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
+  GuidelinesRoute: GuidelinesRoute,
   KidsRoute: KidsRouteWithChildren,
   LoginRoute: LoginRoute,
   MatureRoute: MatureRouteWithChildren,
+  PrivacyRoute: PrivacyRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SearchRoute: SearchRoute,
   ShortFilmsRoute: ShortFilmsRoute,
   SignupRoute: SignupRoute,
   SubscriptionRoute: SubscriptionRoute,
+  TermsRoute: TermsRoute,
   TopRatedRoute: TopRatedRoute,
   TrendingRoute: TrendingRoute,
+  UpcomingRoute: UpcomingRoute,
   WebSeriesRoute: WebSeriesRoute,
   MoviesMovieIdRoute: MoviesMovieIdRoute,
 }

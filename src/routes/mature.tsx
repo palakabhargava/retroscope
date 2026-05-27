@@ -6,6 +6,7 @@ import { ProjectorBeam } from '@/components/cinematic/ProjectorBeam';
 import { SEOHelper } from '@/components/layout/SEOHelper';
 import { Link, useNavigate } from '@tanstack/react-router';
 import { Play, Flame, ShieldAlert, KeyRound, Eye, Skull, ArrowRight, RefreshCw } from 'lucide-react';
+import { CinematicHeroBackdrop } from '@/components/cinematic/CinematicHeroBackdrop';
 
 export const Route = createFileRoute('/mature')({
   component: MaturePageLayout,
@@ -202,9 +203,9 @@ function MaturePageContent() {
       {/* Featured Spotlight Section */}
       {featured ? (
         <section 
-          className="relative h-[70vh] min-h-[500px] w-full overflow-hidden vignette border-b border-red-900/20 shadow-[0_10px_35px_rgba(220,38,38,0.08)]"
-          style={{ backgroundImage: `url(${featured.banner})` }}
+          className="relative h-[62vh] sm:h-[70vh] min-h-[420px] sm:min-h-[500px] w-full overflow-hidden vignette border-b border-red-900/20 shadow-[0_10px_35px_rgba(220,38,38,0.08)]"
         >
+          <CinematicHeroBackdrop item={featured} />
           <ProjectorBeam />
           
           <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-transparent to-black/40" />
@@ -238,7 +239,7 @@ function MaturePageContent() {
       )}
 
       {/* Sub Navigation */}
-      <div className="bg-[#111111]/90 border-y border-red-900/10 backdrop-blur sticky top-[57px] z-30">
+      <div className="bg-[#111111]/90 border-y border-red-900/10 backdrop-blur sticky top-[57px] md:top-0 z-30">
         <div className="mx-auto max-w-7xl px-6 py-4 flex flex-wrap justify-between items-center gap-4">
           <div className="flex items-center gap-2">
             <div className="h-2 w-2 rounded-full bg-red-600 animate-ping" />

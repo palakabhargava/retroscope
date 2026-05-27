@@ -12,6 +12,7 @@ export function MobileNav() {
     { to: '/search', icon: Search, label: 'Browse' },
     { to: '/classics', icon: Clapperboard, label: 'Classics' },
     { to: '/anime', icon: Calendar, label: 'Anime' },
+    { to: '/mature', icon: Calendar, label: '18+' },
     { to: '/watchlist', icon: Film, label: 'Shelf' },
     { to: '/profile', icon: User, label: 'Me' },
   ] as const;
@@ -23,7 +24,7 @@ export function MobileNav() {
   
   return (
     <nav className="fixed inset-x-0 bottom-0 z-40 md:hidden border-t border-border/50 rounded-t-xl shadow-2xl bg-background/80 backdrop-blur-xl safe-bottom pb-safe">
-      <div className="flex justify-around h-20 sm:h-20">
+      <div className="flex justify-around h-[76px] sm:h-20">
         {items.map(({ to, icon: Icon, label }) => {
           const active = path === to || (to !== '/' && path.startsWith(to));
           return (

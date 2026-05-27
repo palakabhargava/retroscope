@@ -13,6 +13,7 @@ export function TopNav() {
     ['/short-films', 'Shorts'],
     ['/trending', 'Trending'],
     ['/top-rated', 'Top Rated'],
+    ['/upcoming', 'Upcoming'],
     ['/subscription', 'Plans'],
   ];
   const authedLinks: Array<[string, string]> = isAuthenticated ? [
@@ -22,7 +23,7 @@ export function TopNav() {
   ] : [];
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-md">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 pt-safe">
         <Link to="/" className="flex items-center gap-2">
           <span className="grid h-8 w-8 place-items-center rounded-sm bg-primary font-display text-lg font-black text-primary-foreground">R</span>
           <span className="font-display text-xl font-black tracking-tight">RetroScope</span>
@@ -38,6 +39,9 @@ export function TopNav() {
         </nav>
         <div className="flex items-center gap-2">
           <Link to="/search" className="grid h-9 w-9 place-items-center rounded-full text-muted-foreground hover:bg-card hover:text-foreground"><Search size={16}/></Link>
+          <Link to="/mature" className="hidden md:inline rounded-sm border border-red-900/40 bg-red-950/15 px-2 py-1 font-retro text-[10px] uppercase tracking-widest text-red-500 hover:bg-red-950/25 hover:border-red-700/50 transition">
+            18+
+          </Link>
           {isAuthenticated && trialDaysLeft > 0 && !isPremium && (
             <span className="hidden md:inline rounded-sm border border-primary/40 bg-primary/10 px-2 py-1 font-retro text-[10px] uppercase tracking-widest text-primary">
               Trial · {trialDaysLeft}d

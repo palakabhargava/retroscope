@@ -11,6 +11,7 @@ import { ProjectorBeam } from '../cinematic/ProjectorBeam';
 import { DustParticles } from '../cinematic/DustParticles';
 import { VHSOverlay } from '../cinematic/VHSOverlay';
 import { IntervalBanner } from '../cinematic/IntervalBanner';
+import { CinematicImage } from '@/components/ui/CinematicImage';
 import { useAuth } from '@/lib/auth';
 import { useAddReaction, useLogPlayEvent } from '@/hooks/queries';
 import { toast } from 'sonner';
@@ -215,9 +216,17 @@ export function FakePlayerModal({ movie, open, onClose }: { movie: Movie | null;
               className="absolute inset-0 w-full h-full overflow-hidden bg-cover bg-center transition-all duration-300" 
               style={{ 
                 filter: getVideoFilterString(),
-                backgroundImage: `url(${movie.banner})` 
               }}
             >
+              <CinematicImage
+                src={movie.banner}
+                alt={movie.title}
+                fallbackTitle={movie.title}
+                atmosphere={movie.atmosphere}
+                aspectRatio="banner"
+                imageType={movie.type === 'anime' ? 'anime' : movie.type === 'mature' ? 'mature' : 'banner'}
+                className="absolute inset-0"
+              />
               {movie.trailerId && !buffering && (
                 <iframe
                   className="absolute inset-0 h-full w-full pointer-events-none scale-105"

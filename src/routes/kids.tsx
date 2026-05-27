@@ -5,6 +5,7 @@ import { ProjectorBeam } from '@/components/cinematic/ProjectorBeam';
 import { Link } from '@tanstack/react-router';
 import { Play, Sparkles, Smile, Compass, Film, Tv } from 'lucide-react';
 import { SEOHelper } from '@/components/layout/SEOHelper';
+import { CinematicHeroBackdrop } from '@/components/cinematic/CinematicHeroBackdrop';
 
 export const Route = createFileRoute('/kids')({
   component: KidsPage,
@@ -44,8 +45,8 @@ function KidsPage() {
       {featured ? (
         <section 
           className="relative h-[65vh] min-h-[480px] w-full overflow-hidden vignette border-b-4 border-[#38BDF8]/20 shadow-[0_8px_30px_rgba(56,189,248,0.15)]"
-          style={{ backgroundImage: `url(${featured.banner})` }}
         >
+          <CinematicHeroBackdrop item={featured} />
           <ProjectorBeam />
           
           <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-black/20" />
@@ -80,7 +81,7 @@ function KidsPage() {
       )}
 
       {/* Playful simplified kids navigation bar */}
-      <div className="bg-[#1E293B]/70 border-b-2 border-dashed border-[#38BDF8]/20 backdrop-blur sticky top-[57px] z-30">
+      <div className="bg-[#1E293B]/70 border-b-2 border-dashed border-[#38BDF8]/20 backdrop-blur sticky top-[57px] md:top-0 z-30">
         <div className="mx-auto max-w-7xl px-6 py-4 flex flex-wrap justify-between items-center gap-4">
           <div className="flex items-center gap-2">
             <div className="h-3 w-3 rounded-full bg-[#38BDF8] animate-ping" />

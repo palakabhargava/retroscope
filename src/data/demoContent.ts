@@ -1968,6 +1968,76 @@ CURATED_DEMO_CONTENT.forEach(item => {
 // Now, dynamically generate to meet target counts for each category
 const getItemsOfType = (type: ContentType) => expandedList.filter(x => x.type === type);
 
+// === Upcoming drops (no schema change; stored via JSON synopsis meta) ===
+const UPCOMING_DROPS = [
+  {
+    title: 'Projector: The Last Reel',
+    type: 'movie' as const,
+    year: 2026,
+    runtime: 148,
+    genres: ['Drama', 'Thriller'],
+    moods: ['night-vibes', 'mind-blowing'] as Mood[],
+    atmosphere: 'thriller' as Atmosphere,
+    director: 'Ananya Rao',
+    cast: ['Lead Actor A', 'Lead Actor B'],
+    tagline: 'When the reel ends, the truth begins.',
+    trailer_id: 'YoHD9XEInc0',
+    meta: { releaseStatus: 'upcoming', releaseDate: '2026-08-15', teaserId: 'EXeTwQWrcwY', ageRating: 'PG-13' },
+  },
+  {
+    title: 'Neon Shogun: Season 1',
+    type: 'web_series' as const,
+    year: 2026,
+    runtime: 48,
+    genres: ['Action', 'Drama', 'Mystery'],
+    moods: ['thriller-rush', 'night-vibes'] as Mood[],
+    atmosphere: 'drama' as Atmosphere,
+    director: 'Karan Iyer',
+    cast: ['Series Lead A', 'Series Lead B'],
+    tagline: 'A city of secrets. A blade of light.',
+    trailer_id: 'zSWdZVtXT7E',
+    meta: { releaseStatus: 'upcoming', releaseDate: '2026-07-02', seasons: 1, episodes: 8, ageRating: '16+' },
+  },
+  {
+    title: 'Vault Protocol: Seinen Cut',
+    type: 'anime' as const,
+    year: 2026,
+    runtime: 24,
+    genres: ['Seinen', 'Cyberpunk', 'Sci-Fi', 'Thriller'],
+    moods: ['mind-blowing', 'night-vibes'] as Mood[],
+    atmosphere: 'sci-fi' as Atmosphere,
+    director: 'Studio Team',
+    cast: ['Voice Actor A', 'Voice Actor B'],
+    tagline: 'Access granted. Humanity denied.',
+    trailer_id: 'G4VmJcZR0Yg',
+    meta: { releaseStatus: 'upcoming', releaseDate: '2026-09-10', studio: 'Production I.G', seasons: 1, episodes: 12, isDualAudio: true, ageRating: '17+', teaserId: 'YzuJnyebc40' },
+  },
+];
+
+UPCOMING_DROPS.forEach((u, idx) => {
+  expandedList.push({
+    id: `up-${String(idx + 1).padStart(3, '0')}`,
+    title: u.title,
+    type: u.type,
+    year: u.year,
+    runtime: u.runtime,
+    genres: u.genres,
+    moods: u.moods,
+    atmosphere: u.atmosphere,
+    director: u.director,
+    cast: u.cast,
+    synopsis: serializeSynopsis(
+      `An upcoming RetroScope drop. This title is scheduled for release soon with teaser-ready playback and cinematic hero banners.`,
+      u.meta
+    ),
+    tagline: u.tagline,
+    poster: null,
+    banner: null,
+    trailer_id: u.trailer_id,
+    is_premium: true,
+  });
+});
+
 // 1. Generate Anime (50 items)
 ANIME_TITLES.forEach((title, idx) => {
   const genres = [

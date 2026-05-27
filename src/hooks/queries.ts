@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { mapDbToMovie, type Movie, type ContentType, type Mood } from '@/data/movies';
 import { DEMO_CONTENT } from '@/data/demoContent';
+import { ANIME_CATALOG, findAnime } from '@/data/anime';
 import { toast } from 'sonner';
 
 // Helper to check if a user is an admin
@@ -107,6 +108,26 @@ export function useContents(filters?: {
       // Hybrid Fallback: Use the high-quality local dataset if Supabase has 0 rows or is offline
       if (dbError || !data || data.length === 0) {
         console.log("Supabase empty or failed, falling back to beautiful local 60+ cinematic dataset. Error:", dbError);
+        // Anime uses a dedicated local architecture (no mixed movie pool).
+        if (filters?.type === 'anime') {
+          let anime = [...ANIME_CATALOG];
+          if (filters?.genre) {
+            anime = anime.filter(c => c.genres.includes(filters.genre!));
+          }
+          if (filters?.mood) {
+            anime = anime.filter(c => c.moods.includes(filters.mood!));
+          }
+          if (filters?.maxRuntime) {
+            anime = anime.filter(c => c.runtime <= filters.maxRuntime!);
+          }
+          if (filters?.order) {
+            if (filters.order === 'title') anime.sort((a, b) => a.title.localeCompare(b.title));
+            else if (filters.order === 'year') anime.sort((a, b) => b.year - a.year);
+          }
+          if (filters?.limit) anime = anime.slice(0, filters.limit);
+          return anime;
+        }
+
         let mappedDemo = DEMO_CONTENT.map(row => mapDbToMovie(row, row.id.startsWith('mv-') ? (7 + (parseInt(row.id.split('-')[1]) % 30) / 10) : 7.5));
         
         if (filters?.type) {
@@ -201,12 +222,13 @@ export function useContentItem(id: string) {
 
       // Fallback: If item is not found in database, pull from beautiful local repository
       if (rowErr || !row) {
-        const found = DEMO_CONTENT.find(item => item.id === id);
-        if (!found) throw new Error('Content not found in local or database repository');
+        const anime = id.startsWith('an-') ? findAnime(id) : undefined;
+        const found = anime ? null : DEMO_CONTENT.find(item => item.id === id);
+        if (!anime && !found) throw new Error('Content not found in local or database repository');
         
         averageRating = id.startsWith('mv-') ? (7 + (parseInt(id.split('-')[1]) % 30) / 10) : 7.5;
         ratingCount = 2; // aesthetic punch counts
-        movie = mapDbToMovie(found, averageRating);
+        movie = anime ? anime : mapDbToMovie(found, averageRating);
         
         reviewsData = [
           {

@@ -229,7 +229,7 @@
   }
   
   /* Mobile Optimization Classes */
-  @screen sm {
+  @media (min-width: 640px) {
     /* Smooth scrolling for better mobile feel */
     html {
       scroll-behavior: smooth;
@@ -294,12 +294,12 @@
   }
   
   /* Mobile-first hidden classes */
-  @screen md {
+  @media (min-width: 768px) {
     .hide-on-mobile { display: block; }
     .show-on-mobile { display: none; }
   }
   
-  @screen sm {
+  @media (min-width: 640px) {
     .hide-on-mobile { display: none; }
     .show-on-mobile { display: block; }
   }

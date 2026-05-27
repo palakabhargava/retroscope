@@ -2,6 +2,8 @@ export type Mood = 'lonely' | 'happy' | 'emotional' | 'night-vibes' | 'mind-blow
 export type Atmosphere = 'horror' | 'romance' | 'sci-fi' | 'drama' | 'thriller' | 'comedy' | 'classic';
 export type ContentType = 'movie' | 'web_series' | 'short_film' | 'documentary' | 'mockumentary' | 'short_video' | 'anime' | 'kids' | 'mature';
 
+export type ReleaseStatus = 'available' | 'upcoming';
+
 export interface Movie {
   id: string;
   title: string;
@@ -31,6 +33,11 @@ export interface Movie {
   ageRating?: string;
   audioLangs?: string[];
   sceneTimestamps?: { time: number; label: string }[];
+
+  // Release & video metadata (stored in DB via JSON synopsis meta)
+  releaseStatus?: ReleaseStatus;
+  releaseDate?: string; // ISO date string
+  teaserId?: string; // YouTube id for teaser
 }
 
 export const CONTENT_TYPES: { id: ContentType; label: string }[] = [
@@ -97,6 +104,10 @@ const bannerStyle =
     ageRating: extraMeta.ageRating || undefined,
     audioLangs: extraMeta.audioLangs || undefined,
     sceneTimestamps: extraMeta.sceneTimestamps || undefined,
+
+    releaseStatus: (extraMeta.releaseStatus as ReleaseStatus) || undefined,
+    releaseDate: extraMeta.releaseDate || undefined,
+    teaserId: extraMeta.teaserId || undefined,
   };
 }
 

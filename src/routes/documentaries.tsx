@@ -6,6 +6,7 @@ import { ProjectorBeam } from '@/components/cinematic/ProjectorBeam';
 import { DustParticles } from '@/components/cinematic/DustParticles';
 import { Link } from '@tanstack/react-router';
 import { Play, Info, Flame, Eye } from 'lucide-react';
+import { CinematicHeroBackdrop } from '@/components/cinematic/CinematicHeroBackdrop';
 
 export const Route = createFileRoute('/documentaries')({
   component: DocumentariesPage,
@@ -56,7 +57,8 @@ function DocumentariesPage() {
 
       {/* Featured Banner Section */}
       {featured ? (
-        <section className="relative h-[65vh] min-h-[480px] w-full overflow-hidden vignette" style={{ backgroundImage: `url(${featured.banner })`}}>
+        <section className="relative h-[65vh] min-h-[480px] w-full overflow-hidden vignette">
+          <CinematicHeroBackdrop item={featured} />
           <ProjectorBeam />
           <DustParticles count={35} />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
