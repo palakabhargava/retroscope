@@ -80,8 +80,8 @@ create policy "Content is publicly readable" on public.content
   for select using (true);
   
 create policy "Admins can manage content" on public.content 
-  for all using (public.has_role(auth.uid(), 'admin')) 
-  with check (public.has_role(auth.uid(), 'admin'));
+  for all using (public.has_role(auth.uid(), 'admin'::app_role)) 
+  with check (public.has_role(auth.uid(), 'admin'::app_role));
 
 -- Ratings policies
 create policy "Ratings are publicly readable" on public.ratings 
@@ -98,7 +98,7 @@ create policy "Users can delete their own ratings" on public.ratings
 
 -- Reviews policies
 create policy "Reviews are readable" on public.reviews 
-  for select using (status = 'approved' or auth.uid() = user_id or public.has_role(auth.uid(), 'admin'));
+  for select using (status = 'approved' or auth.uid() = user_id or public.has_role(auth.uid(), 'admin'::app_role));
   
 create policy "Users can insert their own reviews" on public.reviews 
   for insert with check (auth.uid() = user_id);
@@ -110,8 +110,8 @@ create policy "Users can delete their own reviews" on public.reviews
   for delete using (auth.uid() = user_id);
   
 create policy "Admins can manage reviews" on public.reviews 
-  for all using (public.has_role(auth.uid(), 'admin')) 
-  with check (public.has_role(auth.uid(), 'admin'));
+  for all using (public.has_role(auth.uid(), 'admin'::app_role)) 
+  with check (public.has_role(auth.uid(), 'admin'::app_role));
 
 -- Reactions policies
 create policy "Reactions are publicly readable" on public.reactions 
@@ -122,7 +122,7 @@ create policy "Users can insert their own reactions" on public.reactions
 
 -- Analytics policies
 create policy "Admins can read all analytics" on public.analytics 
-  for select using (public.has_role(auth.uid(), 'admin'));
+  for select using (public.has_role(auth.uid(), 'admin'::app_role));
   
 create policy "Anyone can log analytics" on public.analytics 
   for insert with check (true);

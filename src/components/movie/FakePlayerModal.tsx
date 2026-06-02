@@ -20,7 +20,7 @@ type PlayerTab = 'playback' | 'audio' | 'subtitles' | 'video' | 'stats';
 
 export function FakePlayerModal({ movie, open, onClose }: { movie: Movie | null; open: boolean; onClose: () => void }) {
   const [progress, setProgress] = useState(0);
-  const [playing, setPlaying] = useState(true);
+  const [playing, setPlaying] = useState(false); // START PAUSED to avoid auto-hide bug
   const [vhs, setVhs] = useState(false);
   const [interval, setIntervalOn] = useState(false);
   
@@ -33,6 +33,7 @@ export function FakePlayerModal({ movie, open, onClose }: { movie: Movie | null;
   const [skipIntro, setSkipIntro] = useState(false);
   const [skipRecap, setSkipRecap] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [theaterMode, setTheaterMode] = useState(false);
   
   // Audio State
   const [volume, setVolume] = useState(80);
@@ -60,55 +61,144 @@ export function FakePlayerModal({ movie, open, onClose }: { movie: Movie | null;
   const [filmTint, setFilmTint] = useState(0);
   const [cinematicFilter, setCinematicFilter] = useState<'none' | 'sepia' | 'techno' | 'noir' | 'warm'>('none');
 
-  // Inactivity Auto-fade State
-  const [showControls, setShowControls] = useState(true);
+  // Inactivity Auto-fade State - FIX: Track interaction and mobile detection
+  const [showControls, setShowControls] = useState(true); // Always show initially
+  const [hasUserInteracted, setHasUserInteracted] = useState(false); // Only hide after interaction
+  const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' && window.innerWidth < 768);
   const inactivityTimeoutRef = useRef<number | null>(null);
-
   const playerRef = useRef<HTMLDivElement>(null);
+  const lastInteractionRef = useRef<number>(Date.now());
+
   const { user } = useAuth();
   const addReaction = useAddReaction();
   const logPlay = useLogPlayEvent();
 
+  // FIX: New robust inactivity handler that respects initial state and mobile
   const resetInactivityTimeout = () => {
+    lastInteractionRef.current = Date.now();
+    setHasUserInteracted(true);
     setShowControls(true);
+    
     if (inactivityTimeoutRef.current) {
       window.clearTimeout(inactivityTimeoutRef.current);
     }
-    if (playing && !settingsOpen) {
+    
+    // Don't auto-hide on mobile or when not playing
+    if (!isMobile && playing && !settingsOpen && hasUserInteracted) {
       inactivityTimeoutRef.current = window.setTimeout(() => {
         setShowControls(false);
-      }, 3000);
+      }, 4000); // 4 seconds is more forgiving than 3
     }
   };
 
   useEffect(() => {
-    if (playing && !settingsOpen) {
-      resetInactivityTimeout();
-    } else {
+    // Detect mobile on mount and on resize
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  useEffect(() => {
+    // Always show controls initially, or when paused, or on mobile
+    if (!hasUserInteracted || !playing || settingsOpen || isMobile) {
       setShowControls(true);
       if (inactivityTimeoutRef.current) {
         window.clearTimeout(inactivityTimeoutRef.current);
       }
+    } else {
+      resetInactivityTimeout();
     }
+    
     return () => {
       if (inactivityTimeoutRef.current) {
         window.clearTimeout(inactivityTimeoutRef.current);
       }
     };
-  }, [playing, settingsOpen]);
+  }, [playing, settingsOpen, hasUserInteracted, isMobile]);
+
+  // Keyboard shortcuts support
+  useEffect(() => {
+    if (!open) return;
+    
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Don't trigger if user is typing in an input
+      if (document.activeElement?.tagName === 'INPUT' || document.activeElement?.tagName === 'SELECT') {
+        return;
+      }
+
+      const key = e.key.toLowerCase();
+      
+      if (key === ' ') {
+        e.preventDefault();
+        setPlaying(p => !p);
+        resetInactivityTimeout();
+      } else if (key === 'f') {
+        e.preventDefault();
+        toggleFullscreen();
+        resetInactivityTimeout();
+      } else if (key === 'm') {
+        e.preventDefault();
+        setMuted(m => !m);
+        resetInactivityTimeout();
+      } else if (key === 'arrowright') {
+        e.preventDefault();
+        setProgress(p => Math.min(100, p + 5));
+        resetInactivityTimeout();
+      } else if (key === 'arrowleft') {
+        e.preventDefault();
+        setProgress(p => Math.max(0, p - 5));
+        resetInactivityTimeout();
+      } else if (key === 'arrowup') {
+        e.preventDefault();
+        setVolume(v => Math.min(100, v + 5));
+        resetInactivityTimeout();
+      } else if (key === 'arrowdown') {
+        e.preventDefault();
+        setVolume(v => Math.max(0, v - 5));
+        resetInactivityTimeout();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [open]);
 
   useEffect(() => {
     if (!open) { 
+      // Save watch progress before closing
+      if (movie) {
+        const watchKey = `retroscope_watch_${movie.id}`;
+        localStorage.setItem(watchKey, JSON.stringify({
+          progress,
+          timestamp: Date.now(),
+          duration: movie.runtime
+        }));
+      }
+      
       setProgress(0); 
-      setPlaying(true); 
+      setPlaying(false); // Start paused
       setIntervalOn(false); 
       setBuffering(false);
       setSettingsOpen(false);
+      setHasUserInteracted(false); // Reset interaction flag on close
       return; 
     }
     
-    // Log initial play event in analytics
+    // Restore watch progress on open
     if (movie) {
+      const watchKey = `retroscope_watch_${movie.id}`;
+      try {
+        const saved = localStorage.getItem(watchKey);
+        if (saved) {
+          const { progress: savedProgress } = JSON.parse(saved);
+          setProgress(savedProgress);
+        }
+      } catch (e) {
+        console.warn('Failed to restore watch progress', e);
+      }
+      
       logPlay.mutate({ contentId: movie.id, userId: user?.id || undefined, progress: 0 });
     }
 
@@ -208,7 +298,10 @@ export function FakePlayerModal({ movie, open, onClose }: { movie: Movie | null;
             onMouseMove={resetInactivityTimeout}
             onPointerMove={resetInactivityTimeout}
             onClick={resetInactivityTimeout}
-            className={`relative w-full max-w-5xl overflow-hidden rounded-lg border border-border/80 bg-black shadow-2xl projector-glow my-8 aspect-video select-none
+            className={`relative overflow-hidden rounded-lg border border-border/80 bg-black shadow-2xl projector-glow select-none transition-all duration-300
+              ${theaterMode 
+                ? 'fixed inset-2 w-[calc(100%-1rem)] h-[calc(100%-1rem)] z-[101]' 
+                : 'w-full max-w-5xl my-8 aspect-video'}
               ${(!showControls && playing) ? 'cursor-none' : 'cursor-default'}`}
           >
             {/* Simulated Video Frame Background/Video */}
@@ -459,9 +552,18 @@ export function FakePlayerModal({ movie, open, onClose }: { movie: Movie | null;
                     <button 
                       onClick={toggleFullscreen}
                       className="p-1.5 text-muted-foreground hover:text-foreground transition cursor-pointer hover:bg-white/5 rounded-sm"
-                      title="Simulate Fullscreen"
+                      title="Fullscreen Mode"
                     >
                       <Maximize2 size={15} />
+                    </button>
+
+                    <button 
+                      onClick={() => setTheaterMode(t => !t)}
+                      className={`p-1.5 transition rounded-sm cursor-pointer
+                        ${theaterMode ? 'text-primary bg-white/10' : 'text-muted-foreground hover:text-foreground hover:bg-white/5'}`}
+                      title="Theater Mode - Expanded View"
+                    >
+                      <Film size={15} />
                     </button>
                   </div>
                 </div>
@@ -726,14 +828,14 @@ export function FakePlayerModal({ movie, open, onClose }: { movie: Movie | null;
 
                         <div className="space-y-2">
                           <div>
-                            <label className="block font-retro text-[8px] uppercase tracking-widest text-muted-foreground mb-1">Language</label>
+                            <label className="block font-retro text-[8px] uppercase tracking-widest text-muted-foreground mb-1">Subtitle Language</label>
                             <select value={subLanguage} onChange={e => setSubLanguage(e.target.value)}
-                              className="w-full bg-black/60 text-xs border border-white/10 px-2 py-1 rounded-sm text-foreground">
+                              className="w-full bg-black/60 text-xs border border-white/10 px-2 py-1.5 rounded-sm text-foreground">
+                              <option>Off</option>
                               <option>English</option>
                               <option>Hindi (हिंदी)</option>
-                              <option>Spanish (Español)</option>
-                              <option>French (Français)</option>
-                              <option>Off</option>
+                              <option>Telugu (తెలుగు)</option>
+                              <option>Tamil (தமிழ்)</option>
                             </select>
                           </div>
                           <div>
@@ -788,11 +890,12 @@ export function FakePlayerModal({ movie, open, onClose }: { movie: Movie | null;
                               onChange={e => handleQualityChange(e.target.value)}
                               className="w-full bg-black/60 text-xs border border-white/10 px-2 py-1.5 rounded-sm text-foreground"
                             >
-                              <option>Auto (Adaptive 4K UHD)</option>
-                              <option>2160p (4K UHD Master)</option>
+                              <option>Auto (Adaptive)</option>
                               <option>1080p CineMaster</option>
                               <option>720p Reel Classic</option>
                               <option>480p VHS Dystopia</option>
+                              <option>360p Mobile Compact</option>
+                              <option>144p Potato Network</option>
                             </select>
                           </div>
 

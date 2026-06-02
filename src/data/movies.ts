@@ -4,6 +4,12 @@ export type ContentType = 'movie' | 'web_series' | 'short_film' | 'documentary' 
 
 export type ReleaseStatus = 'available' | 'upcoming';
 
+export interface ThemeMetadata {
+  themeColor?: string;    // Hex color: #FF6B35 for RRR (orange)
+  accentColor?: string;   // Hex color: #FFD700 for Baahubali (gold)
+  gradient?: string;      // CSS gradient: linear-gradient(135deg, #0a1a3a 0%, #2d6e9e 100%) for Interstellar (blue)
+}
+
 export interface Movie {
   id: string;
   title: string;
@@ -38,6 +44,9 @@ export interface Movie {
   releaseStatus?: ReleaseStatus;
   releaseDate?: string; // ISO date string
   teaserId?: string; // YouTube id for teaser
+  
+  // Content Theme Support for UI branding and visual identity
+  theme?: ThemeMetadata;
 }
 
 export const CONTENT_TYPES: { id: ContentType; label: string }[] = [
@@ -53,17 +62,10 @@ export const CONTENT_TYPES: { id: ContentType; label: string }[] = [
 ];
 
 export function mapDbToMovie(row: any, averageRating?: number): Movie {
- const posterStyle =
-  row.poster ||
-  (row.trailer_id
-    ? `https://i.ytimg.com/vi/${row.trailer_id}/hqdefault.jpg`
-    : 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=1200&auto=format&fit=crop');
-
-const bannerStyle =
-  row.banner ||
-  (row.trailer_id
-    ? `https://i.ytimg.com/vi/${row.trailer_id}/maxresdefault.jpg`
-    : 'https://images.unsplash.com/photo-1440404653325-ab127d49abc1?q=80&w=1600&auto=format&fit=crop');
+  // Use provided poster/banner or fallback to category-based defaults
+  // NEVER depend on trailer_id for images to avoid broken YouTube thumbnails
+  const posterStyle = row.poster || '';
+  const bannerStyle = row.banner || '';
   let synopsis = row.synopsis || '';
   let extraMeta: any = {};
   if (typeof synopsis === 'string' && synopsis.trim().startsWith('{')) {
@@ -166,15 +168,16 @@ const TITLES: RawTitle[] = [
   { title: 'Whiplash', year: 2014, runtime: 106, genres: ['Drama','Music'], moods: ['thriller-rush','emotional'], atmosphere: 'drama', director: 'Damien Chazelle', cast: ['Miles Teller','J.K. Simmons','Melissa Benoist'], tagline: 'The road to greatness can take you to the edge.', trailerId: '7d_jQycdQGo', rating: 8.5 },
 ];
 
-const ytPoster  = (id: string) => `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
-const ytBanner  = (id: string) => `https://i.ytimg.com/vi/${id}/maxresdefault.jpg`;
+// TMDB poster CDN URLs - use these for proper high-quality posters
+const TMDB_POSTER_BASE = 'https://image.tmdb.org/t/p/w500';
+const TMDB_BACKDROP_BASE = 'https://image.tmdb.org/t/p/original';
 
-// Wikipedia posters blocked hotlinking, so we removed them to fallback to YouTube thumbnails automatically.
-const POSTER_OVERRIDES: Record<string, string> = {};
+// Poster overrides for specific titles with known TMDB paths
+const POSTER_OVERRIDES: Record<string, { poster?: string; banner?: string }> = {};
 
-export const posterUrl = (title: string, fallback?: string): string | undefined => {
-  const u = POSTER_OVERRIDES[title];
-  return u ?? fallback;
+export const posterUrl = (title: string, type: 'poster' | 'banner' = 'poster'): string | undefined => {
+  const override = POSTER_OVERRIDES[title];
+  return override?.[type];
 };
 
 export const MOVIES: Movie[] = TITLES.map((t, i) => ({
@@ -187,10 +190,8 @@ export const MOVIES: Movie[] = TITLES.map((t, i) => ({
   trailerId: t.trailerId,
   rating: t.rating ?? +(7 + (i % 30) / 10).toFixed(1),
   synopsis: `${t.tagline} A ${t.year} ${t.genres.join(' / ').toLowerCase()} feature directed by ${t.director}, starring ${t.cast.slice(0, 2).join(' and ')}. Presented in the RetroScope projection room as a recruiter-grade demo \u2014 the trailer plays, the feature stays sealed.`,
-  poster: POSTER_OVERRIDES[t.title]
-    ? POSTER_OVERRIDES[t.title]
-    : (t.trailerId ? ytPoster(t.trailerId) : "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=1200&auto=format&fit=crop"),
-  banner: t.trailerId ? ytBanner(t.trailerId) : "https://images.unsplash.com/photo-1440404653325-ab127d49abc1?q=80&w=1600&auto=format&fit=crop",
+  poster: posterUrl(t.title, 'poster') || '',  // Empty string = use CinematicImage fallback chain
+  banner: posterUrl(t.title, 'banner') || '',  // Empty string = use CinematicImage fallback chain
   reactions: [
     { time: 18, emoji: '😮', label: 'Plot twist' },
     { time: 42, emoji: '😭', label: 'Emotional spike' },

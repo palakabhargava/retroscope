@@ -13,7 +13,7 @@ export function SEOHelper({
   title,
   description,
   ogType = 'video.movie',
-  ogImage = 'https://i.ytimg.com/vi/zSWdZVtXT7E/maxresdefault.jpg', // standard iconic banner fallback
+  ogImage = 'https://images.unsplash.com/photo-1440404653325-ab127d49abc1?q=80&w=1200&auto=format&fit=crop', // Proper fallback image
   canonicalPath,
   schema
 }: SEOProps) {

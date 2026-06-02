@@ -35,8 +35,8 @@ interface RawAnimeTitle {
   recommendations?: string[];
 }
 
-const ytPoster = (id: string) => `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
-const ytBanner = (id: string) => `https://i.ytimg.com/vi/${id}/maxresdefault.jpg`;
+const ytPoster = (id: string) => ''; // REMOVED: YouTube thumbnails are unreliable
+const ytBanner = (id: string) => ''; // REMOVED: YouTube thumbnails are unreliable
 
 // Dedicated, anime-only catalog. This intentionally lives outside `demoContent.ts`
 // so anime routes can stay production-clean and never depend on movie datasets.
@@ -248,8 +248,7 @@ const ANIME_TITLES: RawAnimeTitle[] = [
 ];
 
 export const ANIME_CATALOG: Movie[] = ANIME_TITLES.map((a, idx) => {
-  const trailerFallback = a.trailerId ? { poster: ytPoster(a.trailerId), banner: ytBanner(a.trailerId) } : {};
-
+  // Use provided anime artwork or fallback to category defaults (not YouTube thumbnails)
   return {
     id: a.id,
     title: a.title,
@@ -262,8 +261,8 @@ export const ANIME_CATALOG: Movie[] = ANIME_TITLES.map((a, idx) => {
     director: a.director,
     cast: ['Voice Actor A', 'Voice Actor B', 'Voice Actor C'],
     synopsis: a.synopsis,
-    poster: a.poster ?? trailerFallback.poster ?? 'https://images.unsplash.com/photo-1541562232579-512a21360020?q=80&w=1200&auto=format&fit=crop',
-    banner: a.banner ?? trailerFallback.banner ?? 'https://images.unsplash.com/photo-1520975958225-3f61d0d4c3f5?q=80&w=1600&auto=format&fit=crop',
+    poster: a.poster || '',  // Empty string = use CinematicImage fallback chain with anime-specific fallbacks
+    banner: a.banner || '',  // Empty string = use CinematicImage fallback chain with anime-specific fallbacks
     trailerId: a.trailerId,
     tagline: a.tagline,
     isPremium: idx % 3 === 0,

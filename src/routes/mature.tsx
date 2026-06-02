@@ -5,7 +5,8 @@ import { PosterCard } from '@/components/movie/PosterCard';
 import { ProjectorBeam } from '@/components/cinematic/ProjectorBeam';
 import { SEOHelper } from '@/components/layout/SEOHelper';
 import { Link, useNavigate } from '@tanstack/react-router';
-import { Play, Flame, ShieldAlert, KeyRound, Eye, Skull, ArrowRight, RefreshCw } from 'lucide-react';
+import type { Movie } from '@/data/movies';
+import { Play, Flame, ShieldAlert, KeyRound, Eye, Skull, ArrowRight, RefreshCw, TrendingDown, Award, Sparkles } from 'lucide-react';
 import { CinematicHeroBackdrop } from '@/components/cinematic/CinematicHeroBackdrop';
 
 export const Route = createFileRoute('/mature')({
@@ -179,12 +180,28 @@ function MaturePageLayout() {
 
 function MaturePageContent() {
   const { data: contents = [], isLoading } = useContents({ type: 'mature' });
+  const [continueWatching, setContinueWatching] = useState<Movie[]>([]);
 
-  // Filter content subgroups
+  useEffect(() => {
+    // Load continue watching from localStorage
+    const watched = localStorage.getItem('retroscope_continue_watching_mature');
+    if (watched) {
+      try {
+        const watchedIds = JSON.parse(watched) as string[];
+        setContinueWatching(contents.filter(c => watchedIds.includes(c.id)).slice(0, 5));
+      } catch (e) {
+        console.warn('Failed to load continue watching', e);
+      }
+    }
+  }, [contents]);
+
+  // Filter content subgroups with better curation
   const featured = contents.find(c => c.title.includes("Tumbbad") || c.title.includes("Mirzapur") || c.title.includes("Sacred")) || contents[0];
-  const noirThrillers = contents.filter(c => c.genres.includes("Noir") || c.genres.includes("Neo-Noir"));
-  const psychologicalDrama = contents.filter(c => c.genres.includes("Psychological") || c.genres.includes("Mystery"));
-  const darkSeinen = contents.filter(c => c.genres.includes("Seinen") || c.genres.includes("Action"));
+  const trending = contents.slice(0, 8);
+  const noirThrillers = contents.filter(c => c.genres.includes("Noir") || c.genres.includes("Neo-Noir") || c.genres.includes("Crime")).slice(0, 10);
+  const psychologicalDrama = contents.filter(c => c.genres.includes("Psychological") || c.genres.includes("Mystery") || c.genres.includes("Thriller")).slice(0, 10);
+  const newReleases = contents.filter(c => c.year >= 2023).slice(0, 10);
+  const darkSeinen = contents.filter(c => c.genres.includes("Seinen") || c.genres.includes("Action")).slice(0, 10);
 
   return (
     <div className="min-h-screen bg-[#050505] text-foreground pb-20 overflow-hidden relative">
@@ -263,20 +280,100 @@ function MaturePageContent() {
         </div>
       </div>
 
-      {/* Content Shelves */}
-      <div className="mx-auto max-w-7xl px-6 mt-12 space-y-16">
-        {/* Noir Shelves */}
-        <section className="space-y-4">
-          <div className="flex justify-between items-end border-b border-red-900/10 pb-2">
-            <div>
-              <h2 className="font-display text-2xl font-black tracking-tight text-white flex items-center gap-2">🚬 Neo-Noir & Suspense</h2>
-              <p className="text-xs text-red-500 font-retro tracking-widest uppercase">Dark alleys, heavy rain, and hardboiled detectives</p>
+      {/* Content Shelves - Mobile Optimized */}
+      <div className="mx-auto max-w-7xl px-3 sm:px-6 mt-8 sm:mt-12 space-y-12 sm:space-y-16 pb-8">
+        {/* Continue Watching */}
+        {continueWatching.length > 0 && (
+          <section className="space-y-3 sm:space-y-4">
+            <div className="flex justify-between items-end border-b border-red-900/20 pb-2">
+              <h2 className="font-display text-lg sm:text-2xl font-black tracking-tight text-white flex items-center gap-1.5 sm:gap-2">
+                <Flame size={16} className="sm:h-6 sm:w-6" /> Continue Vault Watch
+              </h2>
             </div>
-            <Link to="/mature/noir" className="text-xs font-retro text-red-500 hover:underline">View All</Link>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-4">
+              {continueWatching.map(m => (
+                <div key={m.id}>
+                  <PosterCard movie={m} size="sm" />
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Trending Content */}
+        <section className="space-y-3 sm:space-y-4">
+          <div className="flex justify-between items-end border-b border-red-900/20 pb-2">
+            <div>
+              <h2 className="font-display text-lg sm:text-2xl font-black tracking-tight text-white flex items-center gap-1.5 sm:gap-2">
+                <TrendingDown size={16} className="sm:h-6 sm:w-6" /> Trending in Vault
+              </h2>
+              <p className="text-[10px] sm:text-xs text-[#FFB366] font-retro tracking-widest uppercase mt-0.5">What others are watching now</p>
+            </div>
+            <Link to="/mature/trending" className="text-[10px] sm:text-xs font-retro text-red-400 hover:text-red-300 transition">More</Link>
           </div>
-          <div className="flex gap-6 overflow-x-auto pb-4 pt-1 snap-x scrollbar-thin scrollbar-thumb-red-900/20">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-4 lg:gap-6">
+            {trending.slice(0, 10).map(m => (
+              <div key={m.id}>
+                <PosterCard movie={m} size="md" />
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Top Rated */}
+        <section className="space-y-3 sm:space-y-4">
+          <div className="flex justify-between items-end border-b border-red-900/20 pb-2">
+            <div>
+              <h2 className="font-display text-lg sm:text-2xl font-black tracking-tight text-white flex items-center gap-1.5 sm:gap-2">
+                <Award size={16} className="sm:h-6 sm:w-6" /> Top Rated Dark Cinema
+              </h2>
+              <p className="text-[10px] sm:text-xs text-[#FFB366] font-retro tracking-widest uppercase mt-0.5">Critically acclaimed masterpieces</p>
+            </div>
+            <Link to="/mature/top-rated" className="text-[10px] sm:text-xs font-retro text-red-400 hover:text-red-300 transition">More</Link>
+          </div>
+          <div className="flex gap-2 sm:gap-4 lg:gap-6 overflow-x-auto pb-3 sm:pb-4 pt-1 snap-x scrollbar-thin scrollbar-thumb-red-900/30 md:grid md:grid-cols-5 md:gap-4 md:overflow-visible">
+            {contents.sort((a, b) => b.rating - a.rating).slice(0, 10).map(m => (
+              <div key={m.id} className="snap-start shrink-0 md:snap-align-none md:shrink">
+                <PosterCard movie={m} size="md" />
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* New Releases */}
+        {newReleases.length > 0 && (
+          <section className="space-y-3 sm:space-y-4">
+            <div className="flex justify-between items-end border-b border-red-900/20 pb-2">
+              <div>
+                <h2 className="font-display text-lg sm:text-2xl font-black tracking-tight text-white flex items-center gap-1.5 sm:gap-2">
+                  <Sparkles size={16} className="sm:h-6 sm:w-6" /> New Vaults Unlocked
+                </h2>
+                <p className="text-[10px] sm:text-xs text-[#FFB366] font-retro tracking-widest uppercase mt-0.5">Latest mature releases</p>
+              </div>
+              <Link to="/mature/new-releases" className="text-[10px] sm:text-xs font-retro text-red-400 hover:text-red-300 transition">More</Link>
+            </div>
+            <div className="flex gap-2 sm:gap-4 lg:gap-6 overflow-x-auto pb-3 sm:pb-4 pt-1 snap-x scrollbar-thin scrollbar-thumb-red-900/30 md:grid md:grid-cols-5 md:gap-4 md:overflow-visible">
+              {newReleases.map(m => (
+                <div key={m.id} className="snap-start shrink-0 md:snap-align-none md:shrink">
+                  <PosterCard movie={m} size="md" />
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Crime Thrillers */}
+        <section className="space-y-3 sm:space-y-4">
+          <div className="flex justify-between items-end border-b border-red-900/20 pb-2">
+            <div>
+              <h2 className="font-display text-lg sm:text-2xl font-black tracking-tight text-white flex items-center gap-1.5 sm:gap-2">🚬 Crime & Noir</h2>
+              <p className="text-[10px] sm:text-xs text-[#FFB366] font-retro tracking-widest uppercase mt-0.5">Dark alleys, heavy rain, and hardboiled detectives</p>
+            </div>
+            <Link to="/mature/noir" className="text-[10px] sm:text-xs font-retro text-red-400 hover:text-red-300 transition">View All</Link>
+          </div>
+          <div className="flex gap-2 sm:gap-4 lg:gap-6 overflow-x-auto pb-3 sm:pb-4 pt-1 snap-x scrollbar-thin scrollbar-thumb-red-900/30 md:grid md:grid-cols-5 md:gap-4 md:overflow-visible">
             {noirThrillers.map(m => (
-              <div key={m.id} className="snap-start shrink-0">
+              <div key={m.id} className="snap-start shrink-0 md:snap-align-none md:shrink">
                 <PosterCard movie={m} size="md" />
               </div>
             ))}
@@ -284,20 +381,20 @@ function MaturePageContent() {
         </section>
 
         {/* Psychological Thrillers */}
-        <section className="space-y-4">
-          <div className="flex justify-between items-end border-b border-red-900/10 pb-2">
+        <section className="space-y-3 sm:space-y-4">
+          <div className="flex justify-between items-end border-b border-red-900/20 pb-2">
             <div>
-              <h2 className="font-display text-2xl font-black tracking-tight text-white flex items-center gap-2">🧠 Mind-Bending psychological</h2>
-              <p className="text-xs text-[#FF7A00] font-retro tracking-widest uppercase">Deceptive memories, intense plot twists, and pure dread</p>
+              <h2 className="font-display text-lg sm:text-2xl font-black tracking-tight text-white flex items-center gap-1.5 sm:gap-2">🧠 Mind-Bending Psychological</h2>
+              <p className="text-[10px] sm:text-xs text-[#FFB366] font-retro tracking-widest uppercase mt-0.5">Deceptive memories, intense plot twists, and pure dread</p>
             </div>
-            <Link to="/mature/psychological" className="text-xs font-retro text-red-500 hover:underline">View All</Link>
+            <Link to="/mature/psychological" className="text-[10px] sm:text-xs font-retro text-red-400 hover:text-red-300 transition">View All</Link>
           </div>
-          <div className="flex gap-6 overflow-x-auto pb-4 pt-1 snap-x">
+          <div className="flex gap-2 sm:gap-4 lg:gap-6 overflow-x-auto pb-3 sm:pb-4 pt-1 snap-x scrollbar-thin scrollbar-thumb-red-900/30 md:grid md:grid-cols-5 md:gap-4 md:overflow-visible">
             {psychologicalDrama.map(m => (
-              <div key={m.id} className="snap-start shrink-0">
+              <div key={m.id} className="snap-start shrink-0 md:snap-align-none md:shrink">
                 <PosterCard movie={m} size="md" />
               </div>
-            ))}
+            ))}  
           </div>
         </section>
 

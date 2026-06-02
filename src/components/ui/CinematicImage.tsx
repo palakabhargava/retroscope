@@ -13,25 +13,6 @@ interface CinematicImageProps extends React.ImgHTMLAttributes<HTMLImageElement> 
   imageType?: 'anime' | 'movie' | 'banner' | 'thumbnail' | 'classic' | 'kids' | 'mature';
 }
 
-// YouTube video ID to thumbnail fallback
-function getYoutubeThumbnail(videoId: string, size: 'default' | 'medium' | 'high' = 'high'): string {
-  const qualityMap = {
-    default: 'default',
-    medium: 'mqdefault',
-    high: 'hqdefault',
-  };
-  return `https://i.ytimg.com/vi/${videoId}/${qualityMap[size]}.jpg`;
-}
-
-function extractYoutubeIdFromThumbUrl(url: string): string | null {
-  // Matches:
-  // - https://i.ytimg.com/vi/<id>/maxresdefault.jpg
-  // - https://i.ytimg.com/vi/<id>/hqdefault.jpg
-  // - https://img.youtube.com/vi/<id>/...
-  const m = url.match(/(?:i\.ytimg\.com|img\.youtube\.com)\/vi\/([^/]+)\//i);
-  return m?.[1] ?? null;
-}
-
 export const CinematicImage: React.FC<CinematicImageProps> = React.memo(function CinematicImage({
   src,
   alt,
@@ -49,9 +30,10 @@ export const CinematicImage: React.FC<CinematicImageProps> = React.memo(function
   const [currentFallbackIndex, setCurrentFallbackIndex] = useState(0);
   const retryTimerRef = useRef<number | null>(null);
   const imgRef = useRef<HTMLImageElement>(null);
+  const loadAttemptRef = useRef<Set<string>>(new Set()); // Track attempted URLs to avoid infinite loops
 
   const cleanSrc = useMemo(() => {
-    return src ? src.replace(/^url\(['"]?|['"]?\)$/g, '') : '';
+    return src ? src.replace(/^url\(['"]?|['"]?\)$/g, '').trim() : '';
   }, [src]);
 
   const isGradient = useMemo(() => {
@@ -62,26 +44,26 @@ export const CinematicImage: React.FC<CinematicImageProps> = React.memo(function
     return GRADIENT_PALETTES[atmosphere.toLowerCase()] || GRADIENT_PALETTES.classic;
   }, [atmosphere]);
 
-  // Generate fallback chain on mount
+  // Generate fallback chain on mount - NO YouTube URLs, just category fallbacks
   useEffect(() => {
     const chain: string[] = [];
-    if (cleanSrc) chain.push(cleanSrc);
-
-    // YouTube maxres often 404s; add a quality ladder before generic fallbacks.
-    const ytId = cleanSrc ? extractYoutubeIdFromThumbUrl(cleanSrc) : null;
-    if (ytId) {
-      chain.push(getYoutubeThumbnail(ytId, 'high'));
-      chain.push(getYoutubeThumbnail(ytId, 'medium'));
-      chain.push(getYoutubeThumbnail(ytId, 'default'));
+    
+    // Add primary source first
+    if (cleanSrc && !isGradient) {
+      chain.push(cleanSrc);
     }
 
+    // Add category-specific fallbacks
     chain.push(getImageFallback(imageType, 0));
     chain.push(getImageFallback(imageType, 1));
 
+    // Remove duplicates and limit to reasonable count
     const uniq = Array.from(new Set(chain.filter(Boolean)));
-    const limited = uniq.slice(0, 6);
+    const limited = uniq.slice(0, 4); // Reduced from 6 to 4
+    
     setFallbackChain(limited);
-  }, [cleanSrc, imageType]);
+    loadAttemptRef.current.clear();
+  }, [cleanSrc, imageType, isGradient]);
 
   useEffect(() => {
     if (isGradient) {
@@ -89,7 +71,7 @@ export const CinematicImage: React.FC<CinematicImageProps> = React.memo(function
       return;
     }
     
-    if (cleanSrc && fallbackChain.length > 0) {
+    if (!isGradient && fallbackChain.length > 0) {
       setStatus('loading');
       setRetryCount(0);
       setBlurLoaded(false);
@@ -103,24 +85,28 @@ export const CinematicImage: React.FC<CinematicImageProps> = React.memo(function
         window.clearTimeout(retryTimerRef.current);
       }
     };
-  }, [cleanSrc, isGradient, fallbackChain]);
+  }, [fallbackChain, isGradient]);
 
   const triggerRetry = useCallback(() => {
-    if (retryCount < fallbackChain.length - 1) {
+    if (currentFallbackIndex < fallbackChain.length - 1) {
+      const nextIndex = currentFallbackIndex + 1;
+      setCurrentFallbackIndex(nextIndex);
       setStatus('retrying');
       setRetryCount((prev) => prev + 1);
-      setCurrentFallbackIndex((prev) => prev + 1);
       
-      const delay = (retryCount + 1) * 1000; // Exponential backoff
+      // Linear backoff instead of exponential: 100ms per attempt
+      const delay = 100;
       retryTimerRef.current = window.setTimeout(() => {
         setStatus('loading');
       }, delay);
     } else {
       setStatus('failed');
     }
-  }, [retryCount, fallbackChain.length]);
+  }, [currentFallbackIndex, fallbackChain.length]);
 
-  const currentSrc = fallbackChain[currentFallbackIndex] || cleanSrc;
+  const currentSrc = useMemo(() => {
+    return fallbackChain[currentFallbackIndex] || '';
+  }, [fallbackChain, currentFallbackIndex]);
 
   return (
     <div 
